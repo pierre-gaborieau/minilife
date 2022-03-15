@@ -3,6 +3,7 @@ import 'package:minilife/Model/Alcool/alcool.dart';
 import 'package:minilife/Model/Carreer/carreer.dart';
 import 'package:minilife/Model/Milieu/milieu.dart';
 import 'package:minilife/Model/School/degree.dart';
+import 'package:minilife/Model/School/formation.dart';
 
 class DataCommon {
   static List<Alcool> listAlcool = [
@@ -27,6 +28,8 @@ class DataCommon {
   static List<Carreer> listCarreer = [
     Carreer("Computer Science", milieuTechnology, [])
   ];
+  static Formation formationPrimary =
+      Formation(nom: "Primary School", degree: listDegree[0], duration: 9);
 
   static Milieu milieuTechnology =
       Milieu("Technology", const Icon(Icons.code_outlined));
