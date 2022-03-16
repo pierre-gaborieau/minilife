@@ -1,9 +1,4 @@
-import 'package:flutter/material.dart';
 import 'package:minilife/Model/Alcool/alcool.dart';
-import 'package:minilife/Model/Carreer/carreer.dart';
-import 'package:minilife/Model/Milieu/milieu.dart';
-import 'package:minilife/Model/School/degree.dart';
-import 'package:minilife/Model/School/formation.dart';
 
 class DataCommon {
   static List<Alcool> listAlcool = [
@@ -17,20 +12,4 @@ class DataCommon {
     Alcool(name: "Cocktails", danger: 5),
     Alcool(name: "Gin", danger: 8),
   ];
-  static List<Degree> listDegree = [
-    Degree("Primary School", 1),
-    Degree("Secondary School", 2),
-    Degree("High School", 3),
-    Degree("University", 4),
-    Degree("Graduate", 5),
-    Degree("Special School", 6),
-  ];
-  static List<Carreer> listCarreer = [
-    Carreer("Computer Science", milieuTechnology, [])
-  ];
-  static Formation formationPrimary =
-      Formation(nom: "Primary School", degree: listDegree[0], duration: 9);
-
-  static Milieu milieuTechnology =
-      Milieu("Technology", const Icon(Icons.code_outlined));
 }

@@ -4,12 +4,14 @@ class Poste {
   final String nom;
   final int salaireMin;
   final int salaireMax;
-  final Formation requirement;
+  final Formation? requirement;
+  final Poste? previousPoste;
 
-  Poste(
-    this.requirement, {
+  Poste({
     required this.nom,
     required this.salaireMin,
     required this.salaireMax,
+    required this.requirement,
+    required this.previousPoste,
   });
 }
