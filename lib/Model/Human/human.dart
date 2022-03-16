@@ -5,6 +5,7 @@ import 'package:minilife/Data/data_feed.dart';
 import 'package:minilife/Data/static_degree.dart';
 import 'package:minilife/Data/static_formations.dart';
 import 'package:minilife/Model/Alcool/alcool.dart';
+import 'package:minilife/Model/Carreer/poste.dart';
 import 'package:minilife/Model/School/degree.dart';
 import 'package:minilife/Model/School/formation.dart';
 
@@ -18,6 +19,8 @@ class Human {
   bool isLearning = false;
   int happiness = 100;
   int balance = 0;
+  Poste? actualPoste;
+  List<Poste> career = [];
 
   bool canTherapy = true;
 
