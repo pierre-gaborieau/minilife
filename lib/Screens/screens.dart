@@ -10,6 +10,7 @@ export 'all/professionnal.dart';
 export 'all/professional_addons/education_screen.dart';
 export 'all/professional_addons/jobs_screen.dart';
 export 'all/professional_addons/special_careers.dart';
+export 'all/professional_addons/curriculum_vitae.dart';
 
 ///properties listview links
 export 'all/properties_addons/houses_screen.dart';
