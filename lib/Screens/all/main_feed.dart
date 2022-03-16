@@ -24,9 +24,9 @@ class _MainFeedState extends State<MainFeed> {
         child: Column(
           children: [
             SizedBox(
-              height: 100,
+              height: 80,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Column(
                     children: [
@@ -36,6 +36,13 @@ class _MainFeedState extends State<MainFeed> {
                               DataCommon.mainCharacter
                                   .numberOfAddiction()
                                   .toString())
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text("Balance : " +
+                              DataCommon.mainCharacter.balance.toString() +
+                              " €")
                         ],
                       )
                     ],
@@ -55,7 +62,7 @@ class _MainFeedState extends State<MainFeed> {
               ),
             ),
             Container(
-              height: widget.size.height - 250,
+              height: widget.size.height - 270,
               width: widget.size.width,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),

@@ -31,6 +31,8 @@ class MyApp extends StatelessWidget {
         '/misc': (context) => const MiscScreen(),
         '/cars': (context) => const CarsScreen(),
         '/shopping': (context) => const ShoppingScreen(),
+        //Miscactions links
+        '/addictions': (context) => const AddictionCenter(),
       },
       debugShowCheckedModeBanner: false,
       title: 'MiniLife',

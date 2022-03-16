@@ -18,7 +18,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-        length: 4,
+        initialIndex: 2,
+        length: 5,
         child: Scaffold(
             floatingActionButton: FloatingActionButton(
               onPressed: () {
@@ -33,27 +34,32 @@ class _HomeScreenState extends State<HomeScreen> {
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.miniCenterDocked,
             body: TabBarView(children: [
+              const ProfessionalScreen(),
+              const PropertiesScreen(),
               MainFeed(
                 size: MediaQuery.of(context).size,
               ),
-              const ProfessionalScreen(),
-              const PropertiesScreen(),
-              const RelationsScreen()
+              const RelationsScreen(),
+              const MiscActions(),
             ]),
             bottomNavigationBar: const BottomAppBar(
               shape: CircularNotchedRectangle(),
               notchMargin: 4,
               child: TabBar(
                 tabs: [
-                  SizedBox(height: 60, child: Icon(Icons.feed)),
                   SizedBox(
-                    height: 60,
+                    height: 80,
                     child: Icon(
                       Icons.wallet_travel,
                     ),
                   ),
-                  SizedBox(height: 60, child: Icon(Icons.house_outlined)),
-                  SizedBox(height: 60, child: Icon(Icons.switch_account))
+                  SizedBox(height: 80, child: Icon(Icons.house_outlined)),
+                  SizedBox(height: 80, child: Icon(Icons.feed)),
+                  SizedBox(height: 80, child: Icon(Icons.switch_account)),
+                  SizedBox(
+                    height: 80,
+                    child: Icon(Icons.star_border),
+                  ),
                 ],
                 labelColor: Colors.blue,
               ),

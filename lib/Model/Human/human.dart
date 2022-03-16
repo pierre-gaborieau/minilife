@@ -17,10 +17,14 @@ class Human {
   List<Alcool> alcoolAddict = [];
   bool isLearning = false;
   int happiness = 100;
+  int balance = 0;
+
+  bool canTherapy = true;
 
   Human(this.firstName, this.lastName, this.age);
 
   ageUp() {
+    canTherapy = true;
     //gestion du bonheur
     if (happiness > 0) {
       if (happiness > 3) {
@@ -111,5 +115,24 @@ class Human {
     int addiction = 0;
     addiction += alcoolAddict.length;
     return addiction;
+  }
+
+  alcoolTherapy(Alcool alcool) {
+    if (canTherapy) {
+      int proba = 33;
+      if (happiness > 70) {
+        proba += 30;
+      }
+      int randnum = Random().nextInt(101);
+      if (randnum <= proba) {
+        alcoolAddict.remove(alcool);
+        DataFeed.addEvent("I managed to stop " + alcool.name);
+      } else {
+        DataFeed.addEvent("I failed to stop " + alcool.name);
+      }
+      canTherapy = false;
+    } else {
+      DataFeed.addEvent("I already fought my addictions this year");
+    }
   }
 }
