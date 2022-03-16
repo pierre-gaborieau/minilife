@@ -8,21 +8,21 @@ class ProfessionalScreen extends StatelessWidget {
     return Scaffold(
         body: ListView(
       scrollDirection: Axis.vertical,
-      children: const [
+      children: [
         ListTile(
-          leading: Icon(Icons.menu_book_rounded),
-          title: Text("Education"),
-          onTap: null,
+          leading: const Icon(Icons.menu_book_rounded),
+          title: const Text("Education"),
+          onTap: () => Navigator.pushNamed(context, '/education'),
         ),
         ListTile(
-          leading: Icon(Icons.wallet_travel),
-          title: Text("Jobs"),
-          onTap: null,
+          leading: const Icon(Icons.wallet_travel),
+          title: const Text("Jobs"),
+          onTap: () => Navigator.pushNamed(context, '/jobs'),
         ),
         ListTile(
-          leading: Icon(Icons.star_border_outlined),
-          title: Text("Special Career"),
-          onTap: null,
+          leading: const Icon(Icons.star_border_outlined),
+          title: const Text("Special Career"),
+          onTap: () => Navigator.pushNamed(context, '/specialcareers'),
         )
       ],
     ));
