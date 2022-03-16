@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:minilife/Data/data_common.dart';
 
 import 'package:minilife/Data/data_feed.dart';
 
@@ -20,15 +21,51 @@ class _MainFeedState extends State<MainFeed> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(30.0),
-        child: Container(
-          height: widget.size.height,
-          width: widget.size.width,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15), color: Colors.grey[200]),
-          child: SingleChildScrollView(
-            child: Text(DataFeed.dataFeed),
-            reverse: true,
-          ),
+        child: Column(
+          children: [
+            SizedBox(
+              height: 100,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          Text("Addictions : " +
+                              DataCommon.mainCharacter
+                                  .numberOfAddiction()
+                                  .toString())
+                        ],
+                      )
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          Text("Happiness : " +
+                              DataCommon.mainCharacter.happiness.toString() +
+                              "%")
+                        ],
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              height: widget.size.height - 250,
+              width: widget.size.width,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: Colors.grey[200]),
+              child: SingleChildScrollView(
+                child: Text(DataFeed.dataFeed),
+                reverse: true,
+              ),
+            ),
+          ],
         ),
       ),
     );

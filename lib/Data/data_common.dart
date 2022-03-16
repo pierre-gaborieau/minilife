@@ -1,4 +1,3 @@
-import 'package:minilife/Data/data_feed.dart';
 import 'package:minilife/Model/Alcool/alcool.dart';
 import 'package:minilife/Model/Human/human.dart';
 
