@@ -5,8 +5,13 @@ class MainFeed extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Text("Feed"),
-    );
+    return Scaffold(
+        body: Padding(
+      padding: const EdgeInsets.all(30.0),
+      child: Container(
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15), color: Colors.grey[200]),
+      ),
+    ));
   }
 }
