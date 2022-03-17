@@ -49,6 +49,17 @@ class Human {
       if (actualJobOffer!.entreprise.hasFullCorporate == false) {
         risk += 5;
       }
+
+      if (performancePro == 0) {
+        risk += 20;
+      } else if (performancePro! < 10) {
+        risk += 15;
+      } else if (performancePro! < 20) {
+        risk += 10;
+      } else if (performancePro! < 30) {
+        risk += 5;
+      }
+
       int randNum = Random().nextInt(101);
       if (randNum < risk) {
         career.add(actualJobOffer!);
