@@ -26,7 +26,21 @@ class JobsScreen extends StatelessWidget {
               ListTile(
                 leading: DataCommon
                     .mainCharacter.actualJobOffer!.entreprise.milieu.icon,
-                title: Text(DataCommon.mainCharacter.actualJobOffer!.poste.nom),
+                title: Text(DataCommon.mainCharacter.actualJobOffer!.poste.nom +
+                    " • " +
+                    DataCommon.mainCharacter.actualJobOffer!.entreprise.nom),
+                subtitle: Text("Performance : " +
+                    DataCommon.mainCharacter.performancePro.toString() +
+                    " %"),
+                tileColor: Colors.grey[200],
+              ),
+            if (DataCommon.mainCharacter.actualJobOffer != null &&
+                DataCommon.mainCharacter.canWorkHarder)
+              ListTile(
+                leading: const Icon(Icons.edit_outlined),
+                title: const Text("Work Harder !"),
+                onTap: () => DataCommon.mainCharacter.workharder(),
+                tileColor: Colors.grey[200],
               ),
             for (int i = 0; i < StaticCarreer.jobOffer.length; i++)
               ListTile(

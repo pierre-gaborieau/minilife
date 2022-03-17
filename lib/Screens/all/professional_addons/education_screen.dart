@@ -26,18 +26,21 @@ class EducationScreen extends StatelessWidget {
             ),
           if (DataCommon.mainCharacter.currentlyLearning != null)
             ListTile(
-                leading: const Icon(Icons.border_color_rounded),
-                title: Text(DataCommon.mainCharacter.currentlyLearning!.nom),
-                subtitle: Text("Years left : " +
-                    DataCommon.mainCharacter.currentlyLearning!
-                        .yearsLeft(DataCommon.mainCharacter.age)
-                        .toString() +
-                    " Performance : " +
-                    DataCommon.mainCharacter.performancePro.toString() +
-                    " %")),
+              leading: const Icon(Icons.border_color_rounded),
+              title: Text(DataCommon.mainCharacter.currentlyLearning!.nom),
+              subtitle: Text("Years left : " +
+                  DataCommon.mainCharacter.currentlyLearning!
+                      .yearsLeft(DataCommon.mainCharacter.age)
+                      .toString() +
+                  " Performance : " +
+                  DataCommon.mainCharacter.performancePro.toString() +
+                  " %"),
+              tileColor: Colors.grey[200],
+            ),
           if (DataCommon.mainCharacter.isLearning &&
               DataCommon.mainCharacter.canWorkHarder)
             ListTile(
+              tileColor: Colors.grey[200],
               leading: const Icon(Icons.edit_outlined),
               title: const Text("Work Harder !"),
               onTap: () => DataCommon.mainCharacter.workharder(),

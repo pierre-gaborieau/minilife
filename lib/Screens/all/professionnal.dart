@@ -15,6 +15,20 @@ class ProfessionalScreen extends StatelessWidget {
             leading: const Icon(Icons.menu_book_rounded),
             title: Text(DataCommon.mainCharacter.currentlyLearning!.nom),
             tileColor: Colors.grey[200],
+            subtitle: Text("Performance : " +
+                DataCommon.mainCharacter.performancePro!.toString() +
+                " %"),
+          ),
+        if (DataCommon.mainCharacter.actualJobOffer != null)
+          ListTile(
+            leading:
+                DataCommon.mainCharacter.actualJobOffer!.entreprise.milieu.icon,
+            title: Text(DataCommon.mainCharacter.actualJobOffer!.poste.nom +
+                " • " +
+                DataCommon.mainCharacter.actualJobOffer!.entreprise.nom),
+            subtitle: Text("Performance : " +
+                DataCommon.mainCharacter.performancePro!.toString() +
+                " %"),
           ),
         ListTile(
           leading: const Icon(Icons.menu_book_rounded),
