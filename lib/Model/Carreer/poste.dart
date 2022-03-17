@@ -5,7 +5,7 @@ class Poste {
   final int salaireMin;
   final int salaireMax;
   final Formation? requirement;
-  final Poste? previousPoste;
+  Poste? previousPoste;
 
   Poste({
     required this.nom,

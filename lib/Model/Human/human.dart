@@ -1,11 +1,11 @@
 import 'dart:math';
-
 import 'package:minilife/Data/data_common.dart';
 import 'package:minilife/Data/data_feed.dart';
+import 'package:minilife/Data/static_carreer.dart';
 import 'package:minilife/Data/static_degree.dart';
 import 'package:minilife/Data/static_formations.dart';
 import 'package:minilife/Model/Alcool/alcool.dart';
-import 'package:minilife/Model/Carreer/poste.dart';
+import 'package:minilife/Model/Carreer/job_offer.dart';
 import 'package:minilife/Model/School/degree.dart';
 import 'package:minilife/Model/School/formation.dart';
 
@@ -19,26 +19,42 @@ class Human {
   bool isLearning = false;
   int happiness = 100;
   int balance = 0;
-  Poste? actualPoste;
-  List<Poste> career = [];
+  JobOffer? actualJobOffer;
+  List<JobOffer> career = [];
 
   bool canTherapy = true;
 
   Human(this.firstName, this.lastName, this.age);
 
   ageUp() {
+    StaticCarreer.regenerateJobOffer();
+
     canTherapy = true;
     //gestion du bonheur
-    if (happiness > 0) {
-      if (happiness > 3) {
-        happiness -= 3;
-      } else {
-        happiness = 0;
-      }
-      happiness - alcoolAddict.length;
-    }
+    updateHappiness(3 + alcoolAddict.length, false);
     age++;
     DataFeed.addEvent("\n\n" + age.toString() + " years old");
+
+    ///Jour de paie !
+    if (actualJobOffer != null) {
+      balance += actualJobOffer!.salaire * 1000;
+    }
+
+    ///Risque de licenciement
+    if (actualJobOffer != null) {
+      int risk = 5;
+      if (actualJobOffer!.entreprise.hasFullCorporate == false) {
+        risk += 5;
+      }
+      int randNum = Random().nextInt(101);
+      if (randNum < risk) {
+        career.add(actualJobOffer!);
+        DataFeed.addEvent(
+            "I have been laid off " + actualJobOffer!.entreprise.nom);
+        updateHappiness(20, false);
+        actualJobOffer = null;
+      }
+    }
 
     ///Début de l'école
     if (age == StaticFormations.agePrimary) {
@@ -99,7 +115,7 @@ class Human {
   setCurrentlyLearning(Formation formation) {
     if (currentlyLearning != null) {
       DataFeed.addEvent("I graduated from " + currentlyLearning!.nom);
-      happiness += 15;
+      updateHappiness(15, true);
     }
     currentlyLearning = formation;
     currentlyLearning!.setGraduate(age);
@@ -130,12 +146,59 @@ class Human {
       if (randnum <= proba) {
         alcoolAddict.remove(alcool);
         DataFeed.addEvent("I managed to stop " + alcool.name);
+        updateHappiness(10, true);
       } else {
         DataFeed.addEvent("I failed to stop " + alcool.name);
       }
       canTherapy = false;
     } else {
       DataFeed.addEvent("I already fought my addictions this year");
+    }
+  }
+
+  jobInterview(JobOffer offer) {
+    if (offer.alreadyAsk) {
+      DataFeed.addEvent(
+          offer.entreprise.nom + " asked me to stop calling them for the job");
+    } else {
+      offer.alreadyAsk = true;
+      int proba = 10;
+      if (offer.poste.requirement != null) {
+        if (listFormations.contains(offer.poste.requirement!)) {
+          proba += 35;
+        }
+      }
+      if (offer.poste.previousPoste != null) {
+        if (actualJobOffer!.poste == offer.poste.previousPoste) {
+          proba += 35;
+        }
+      }
+
+      int randNum = Random().nextInt(101);
+      if (randNum < proba) {
+        updateHappiness(20, true);
+        actualJobOffer = offer;
+        DataFeed.addEvent("I've start a new job as a " +
+            offer.poste.nom +
+            " at " +
+            offer.entreprise.nom);
+      } else {
+        updateHappiness(10, false);
+        DataFeed.addEvent("I didn't get the job of " +
+            offer.poste.nom +
+            " at " +
+            offer.entreprise.nom);
+      }
+    }
+  }
+
+  updateHappiness(int increment, bool isPlus) {
+    if (isPlus) {
+      happiness += increment;
+      happiness > 100 ? happiness = 100 : true;
+    } else {
+      happiness -= increment;
+      happiness < 0 ? happiness = 0 : true;
     }
   }
 }

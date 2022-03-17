@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:minilife/Data/data_common.dart';
 
 class ProfessionalScreen extends StatelessWidget {
   const ProfessionalScreen({Key? key}) : super(key: key);
@@ -9,6 +10,12 @@ class ProfessionalScreen extends StatelessWidget {
         body: ListView(
       scrollDirection: Axis.vertical,
       children: [
+        if (DataCommon.mainCharacter.currentlyLearning != null)
+          ListTile(
+            leading: const Icon(Icons.menu_book_rounded),
+            title: Text(DataCommon.mainCharacter.currentlyLearning!.nom),
+            tileColor: Colors.grey[200],
+          ),
         ListTile(
           leading: const Icon(Icons.menu_book_rounded),
           title: const Text("Education"),

@@ -5,6 +5,7 @@ class JobOffer {
   final Entreprise entreprise;
   final Poste poste;
   final int salaire;
+  bool alreadyAsk = false;
 
   JobOffer({
     required this.entreprise,

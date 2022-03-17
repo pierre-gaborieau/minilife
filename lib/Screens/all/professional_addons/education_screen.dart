@@ -19,7 +19,7 @@ class EducationScreen extends StatelessWidget {
             ),
           if (DataCommon.mainCharacter.listFormations.isNotEmpty)
             ListTile(
-              tileColor: Colors.grey[400],
+              tileColor: Colors.grey[200],
               leading: const Icon(Icons.book),
               title: const Text("Curriculum Vitae"),
               onTap: () => Navigator.pushNamed(context, '/cv'),
@@ -32,7 +32,7 @@ class EducationScreen extends StatelessWidget {
                     DataCommon.mainCharacter.currentlyLearning!
                         .yearsLeft(DataCommon.mainCharacter.age)
                         .toString())),
-          if (DataCommon.mainCharacter.age == StaticFormations.minDropOutAge &&
+          if (DataCommon.mainCharacter.age >= StaticFormations.minDropOutAge &&
               DataCommon.mainCharacter.isLearning)
             ListTile(
                 leading: const Icon(Icons.cancel),

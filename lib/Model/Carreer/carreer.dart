@@ -4,7 +4,7 @@ import 'package:minilife/Model/Milieu/milieu.dart';
 class Carreer {
   final String nom;
   final Milieu milieu;
-  final List<Poste> listPoste;
+  List<Poste>? listPoste;
 
   Carreer(
     this.nom,
