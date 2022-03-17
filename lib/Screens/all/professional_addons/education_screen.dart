@@ -31,7 +31,17 @@ class EducationScreen extends StatelessWidget {
                 subtitle: Text("Years left : " +
                     DataCommon.mainCharacter.currentlyLearning!
                         .yearsLeft(DataCommon.mainCharacter.age)
-                        .toString())),
+                        .toString() +
+                    " Performance : " +
+                    DataCommon.mainCharacter.performancePro.toString() +
+                    " %")),
+          if (DataCommon.mainCharacter.isLearning &&
+              DataCommon.mainCharacter.canWorkHarder)
+            ListTile(
+              leading: const Icon(Icons.edit_outlined),
+              title: const Text("Work Harder !"),
+              onTap: () => DataCommon.mainCharacter.workharder(),
+            ),
           if (DataCommon.mainCharacter.age >= StaticFormations.minDropOutAge &&
               DataCommon.mainCharacter.isLearning)
             ListTile(

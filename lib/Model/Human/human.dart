@@ -20,15 +20,18 @@ class Human {
   int happiness = 100;
   int balance = 0;
   JobOffer? actualJobOffer;
+  int? performancePro;
   List<JobOffer> career = [];
 
   bool canTherapy = true;
+  bool canWorkHarder = true;
 
   Human(this.firstName, this.lastName, this.age);
 
   ageUp() {
     StaticCarreer.regenerateJobOffer();
 
+    canWorkHarder = true;
     canTherapy = true;
     //gestion du bonheur
     updateHappiness(3 + alcoolAddict.length, false);
@@ -52,6 +55,7 @@ class Human {
         DataFeed.addEvent(
             "I have been laid off " + actualJobOffer!.entreprise.nom);
         updateHappiness(20, false);
+        performancePro = null;
         actualJobOffer = null;
       }
     }
@@ -60,6 +64,7 @@ class Human {
     if (age == StaticFormations.agePrimary) {
       isLearning = true;
       setCurrentlyLearning(StaticFormations.formationPrimary);
+      performancePro = Random().nextInt(101);
     }
 
     ///Gestion de l'école
@@ -78,10 +83,24 @@ class Human {
           setCurrentlyLearning(StaticFormations.formationHigh);
         } else if (aimDegree == StaticDegree.high) {
           /// Choix Cursus ou dropout
-          setCurrentlyLearning(StaticFormations.formationComputerScience);
+          if (performancePro! > 60) {
+            setCurrentlyLearning(StaticFormations.formationComputerScience);
+          } else {
+            DataFeed.addEvent("My grades were too bad to apply to university");
+            isLearning = false;
+            currentlyLearning = null;
+            performancePro = null;
+          }
         } else if (aimDegree == StaticDegree.university) {
           /// Choix Graduate ou dropout
-          setCurrentlyLearning(StaticFormations.formationGraduate);
+          if (performancePro! > 90) {
+            setCurrentlyLearning(StaticFormations.formationGraduate);
+          } else {
+            DataFeed.addEvent("My grades were too bad to apply to a graduate");
+            isLearning = false;
+            currentlyLearning = null;
+            performancePro = null;
+          }
         }
       }
     }
@@ -117,6 +136,11 @@ class Human {
       DataFeed.addEvent("I graduated from " + currentlyLearning!.nom);
       updateHappiness(15, true);
     }
+    if (performancePro != null) {
+      performancePro = performancePro! - 10;
+    } else {
+      performancePro = 40;
+    }
     currentlyLearning = formation;
     currentlyLearning!.setGraduate(age);
     DataFeed.addEvent("I've start to learn at " + formation.nom);
@@ -126,6 +150,7 @@ class Human {
     if (age >= StaticFormations.minDropOutAge) {
       isLearning = false;
       currentlyLearning = null;
+      performancePro = null;
       DataFeed.addEvent("I droped-out from school");
     }
   }
@@ -177,6 +202,7 @@ class Human {
       int randNum = Random().nextInt(101);
       if (randNum < proba) {
         updateHappiness(20, true);
+        performancePro = 40;
         actualJobOffer = offer;
         DataFeed.addEvent("I've start a new job as a " +
             offer.poste.nom +
@@ -199,6 +225,21 @@ class Human {
     } else {
       happiness -= increment;
       happiness < 0 ? happiness = 0 : true;
+    }
+  }
+
+  workharder() {
+    if (performancePro != null) {
+      canWorkHarder = false;
+      int randnum = Random().nextInt(101);
+      if (randnum > 50) {
+        DataFeed.addEvent("I've start working harder");
+        performancePro = performancePro! + 10;
+      } else {
+        DataFeed.addEvent("I tried to work harder but prefered to play.");
+      }
+      performancePro! < 0 ? performancePro = 0 : true;
+      performancePro! > 100 ? performancePro = 100 : true;
     }
   }
 }

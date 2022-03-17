@@ -22,6 +22,12 @@ class JobsScreen extends StatelessWidget {
                 leading: Icon(Icons.school_outlined),
                 title: Text("You are not able to get a job."),
               ),
+            if (DataCommon.mainCharacter.actualJobOffer != null)
+              ListTile(
+                leading: DataCommon
+                    .mainCharacter.actualJobOffer!.entreprise.milieu.icon,
+                title: Text(DataCommon.mainCharacter.actualJobOffer!.poste.nom),
+              ),
             for (int i = 0; i < StaticCarreer.jobOffer.length; i++)
               ListTile(
                 leading: StaticCarreer.jobOffer[i].entreprise.milieu.icon,
