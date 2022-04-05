@@ -1,8 +1,10 @@
+import 'package:minilife/Data/static_country.dart';
 import 'package:minilife/Model/Alcool/alcool.dart';
 import 'package:minilife/Model/Human/human.dart';
 
 class DataCommon {
-  static Human mainCharacter = Human("Pierre", "Gaborieau", 0);
+  static Human mainCharacter = Human("Pierre", "Gaborieau", 0,
+      StaticCountry.france, StaticCountry.france, StaticCountry.france);
 
   static List<Alcool> listAlcool = [
     Alcool(name: "Beer", danger: 1),

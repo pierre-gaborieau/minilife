@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
 class PropertiesScreen extends StatelessWidget {
-  const PropertiesScreen({Key? key}) : super(key: key);
+  final ValueChanged<int> update;
+  const PropertiesScreen({
+    Key? key,
+    required this.update,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +16,7 @@ class PropertiesScreen extends StatelessWidget {
         ListTile(
           leading: const Icon(Icons.house_rounded),
           title: const Text("Manage Houses"),
-          onTap: () => Navigator.pushNamed(context, '/houses'),
+          onTap: () => _navigateToHouses(context),
         ),
         ListTile(
           leading: const Icon(Icons.vpn_key_outlined),
@@ -30,5 +34,13 @@ class PropertiesScreen extends StatelessWidget {
             onTap: () => Navigator.pushNamed(context, '/shopping')),
       ],
     ));
+  }
+
+  void _navigateToHouses(BuildContext context) async {
+    var translate = await Navigator.of(context).pushNamed("/houses");
+
+    if (translate == true) {
+      update(2);
+    }
   }
 }

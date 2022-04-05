@@ -12,15 +12,17 @@ class JobsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     StaticCarreer.updatePreviousPoste(StaticCarreer.computerScienceCarreer);
+    StaticCarreer.jobOffer.shuffle();
     return Scaffold(
         appBar: AppBar(),
         body: ListView(
           children: [
             if (DataCommon.mainCharacter.age < StaticCarreer.minAgeTravail ||
                 DataCommon.mainCharacter.isLearning)
-              const ListTile(
-                leading: Icon(Icons.school_outlined),
-                title: Text("You are not able to get a job."),
+              ListTile(
+                tileColor: Colors.grey[200],
+                leading: const Icon(Icons.school_outlined),
+                title: const Text("You are not able to get a job."),
               ),
             if (DataCommon.mainCharacter.actualJobOffer != null)
               ListTile(
@@ -34,12 +36,23 @@ class JobsScreen extends StatelessWidget {
                     " %"),
                 tileColor: Colors.grey[200],
               ),
+            if (DataCommon.mainCharacter.listFormations.isNotEmpty ||
+                DataCommon.mainCharacter.career.isNotEmpty)
+              ListTile(
+                tileColor: Colors.grey[200],
+                leading: const Icon(Icons.book),
+                title: const Text("Curriculum Vitae"),
+                onTap: () => Navigator.pushNamed(context, '/cv'),
+              ),
             if (DataCommon.mainCharacter.actualJobOffer != null &&
                 DataCommon.mainCharacter.canWorkHarder)
               ListTile(
                 leading: const Icon(Icons.edit_outlined),
                 title: const Text("Work Harder !"),
-                onTap: () => DataCommon.mainCharacter.workharder(),
+                onTap: () {
+                  DataCommon.mainCharacter.workharder();
+                  Navigator.pop(context, true);
+                },
                 tileColor: Colors.grey[200],
               ),
             for (int i = 0; i < StaticCarreer.jobOffer.length; i++)
@@ -83,7 +96,8 @@ class JobsScreen extends StatelessWidget {
                                   onPressed: () {
                                     DataCommon.mainCharacter
                                         .jobInterview(offer);
-                                    Navigator.pop(context);
+                                    Navigator.pop(context, true);
+                                    Navigator.pop(context, true);
                                   },
                                   child: const Text('Take an interview'),
                                 ),

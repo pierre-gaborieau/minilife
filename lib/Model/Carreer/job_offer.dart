@@ -6,6 +6,7 @@ class JobOffer {
   final Poste poste;
   final int salaire;
   bool alreadyAsk = false;
+  int yearsInPost = 0;
 
   JobOffer({
     required this.entreprise,

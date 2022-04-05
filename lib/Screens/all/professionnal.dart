@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:minilife/Data/data_common.dart';
 
 class ProfessionalScreen extends StatelessWidget {
-  const ProfessionalScreen({Key? key}) : super(key: key);
+  final ValueChanged<int> update;
+  const ProfessionalScreen({
+    Key? key,
+    required this.update,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,12 +37,12 @@ class ProfessionalScreen extends StatelessWidget {
         ListTile(
           leading: const Icon(Icons.menu_book_rounded),
           title: const Text("Education"),
-          onTap: () => Navigator.pushNamed(context, '/education'),
+          onTap: () => _navigateToEducation(context),
         ),
         ListTile(
           leading: const Icon(Icons.wallet_travel),
           title: const Text("Jobs"),
-          onTap: () => Navigator.pushNamed(context, '/jobs'),
+          onTap: () => _navigateToJobs(context),
         ),
         ListTile(
           leading: const Icon(Icons.star_border_outlined),
@@ -47,5 +51,21 @@ class ProfessionalScreen extends StatelessWidget {
         )
       ],
     ));
+  }
+
+  void _navigateToEducation(BuildContext context) async {
+    var translate = await Navigator.of(context).pushNamed("/education");
+
+    if (translate == true) {
+      update(2);
+    }
+  }
+
+  void _navigateToJobs(BuildContext context) async {
+    var translate = await Navigator.of(context).pushNamed("/jobs");
+
+    if (translate == true) {
+      update(2);
+    }
   }
 }

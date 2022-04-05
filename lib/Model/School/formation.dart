@@ -19,4 +19,8 @@ class Formation {
   int yearsLeft(int age) {
     return ageGraduate! - age;
   }
+
+  String getName() {
+    return nom;
+  }
 }

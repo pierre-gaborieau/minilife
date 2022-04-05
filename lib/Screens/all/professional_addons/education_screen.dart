@@ -17,7 +17,8 @@ class EducationScreen extends StatelessWidget {
               leading: Icon(Icons.bedroom_baby_outlined),
               title: Text("Wait ! You're still a baby !"),
             ),
-          if (DataCommon.mainCharacter.listFormations.isNotEmpty)
+          if (DataCommon.mainCharacter.listFormations.isNotEmpty ||
+              DataCommon.mainCharacter.career.isNotEmpty)
             ListTile(
               tileColor: Colors.grey[200],
               leading: const Icon(Icons.book),
@@ -43,7 +44,10 @@ class EducationScreen extends StatelessWidget {
               tileColor: Colors.grey[200],
               leading: const Icon(Icons.edit_outlined),
               title: const Text("Work Harder !"),
-              onTap: () => DataCommon.mainCharacter.workharder(),
+              onTap: () {
+                Navigator.pop(context, true);
+                DataCommon.mainCharacter.workharder();
+              },
             ),
           if (DataCommon.mainCharacter.age >= StaticFormations.minDropOutAge &&
               DataCommon.mainCharacter.isLearning)
@@ -51,7 +55,7 @@ class EducationScreen extends StatelessWidget {
                 leading: const Icon(Icons.cancel),
                 title: const Text("Dropout School"),
                 onTap: () {
-                  Navigator.pop(context);
+                  Navigator.pop(context, true);
                   DataCommon.mainCharacter.dropOutSchool();
                 }),
         ],

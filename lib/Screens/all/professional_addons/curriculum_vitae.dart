@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:minilife/Data/data_common.dart';
+import 'package:minilife/Model/Carreer/job_offer.dart';
 import 'package:minilife/Model/School/formation.dart';
 
 class CurriculumVitae extends StatelessWidget {
@@ -16,6 +17,12 @@ class CurriculumVitae extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.school),
               title: Text(f.nom),
+            ),
+          for (JobOffer offer in DataCommon.mainCharacter.career)
+            ListTile(
+              leading: offer.entreprise.milieu.icon,
+              title: Text(offer.poste.nom + " • " + offer.entreprise.nom),
+              subtitle: Text(offer.yearsInPost.toString() + " years"),
             )
         ],
       ),

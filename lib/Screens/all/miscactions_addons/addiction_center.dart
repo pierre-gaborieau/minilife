@@ -22,7 +22,7 @@ class AddictionCenter extends StatelessWidget {
               title: Text("Try to stop " + a.name),
               onTap: () {
                 DataCommon.mainCharacter.alcoolTherapy(a);
-                Navigator.pop(context);
+                Navigator.pop(context, true);
               },
             )
         ],

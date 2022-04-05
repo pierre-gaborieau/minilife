@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
 class MiscActions extends StatelessWidget {
-  const MiscActions({Key? key}) : super(key: key);
+  final ValueChanged<int> update;
+  const MiscActions({
+    Key? key,
+    required this.update,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -11,10 +15,18 @@ class MiscActions extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.local_hospital_outlined),
             title: const Text("Addiction Center"),
-            onTap: () => Navigator.pushNamed(context, '/addictions'),
+            onTap: () => _navigateToAddiction(context),
           ),
         ],
       ),
     );
+  }
+
+  void _navigateToAddiction(BuildContext context) async {
+    var translate = await Navigator.of(context).pushNamed("/addictions");
+
+    if (translate == true) {
+      update(2);
+    }
   }
 }

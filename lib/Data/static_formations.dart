@@ -31,11 +31,17 @@ class StaticFormations {
     degree: StaticDegree.university,
     duration: 4,
   );
+  static Formation formationEconomy = Formation(
+      nom: "Economy University", degree: StaticDegree.university, duration: 4);
+
   static Formation formationGraduate = Formation(
     nom: "University Graduate",
     degree: StaticDegree.graduate,
     duration: 1,
   );
 
-  static List<Formation> listUniveristy = [formationComputerScience];
+  static List<Formation> listUniveristy = [
+    formationComputerScience,
+    formationEconomy
+  ];
 }

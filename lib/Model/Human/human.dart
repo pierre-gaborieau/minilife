@@ -1,13 +1,18 @@
 import 'dart:math';
+import 'package:flutter/material.dart';
 import 'package:minilife/Data/data_common.dart';
 import 'package:minilife/Data/data_feed.dart';
 import 'package:minilife/Data/static_carreer.dart';
 import 'package:minilife/Data/static_degree.dart';
 import 'package:minilife/Data/static_formations.dart';
+import 'package:minilife/Data/static_house.dart';
 import 'package:minilife/Model/Alcool/alcool.dart';
 import 'package:minilife/Model/Carreer/job_offer.dart';
+import 'package:minilife/Model/Country/country.dart';
+import 'package:minilife/Model/Houses/rent.dart';
 import 'package:minilife/Model/School/degree.dart';
 import 'package:minilife/Model/School/formation.dart';
+import 'package:minilife/Screens/all/home_screen.dart';
 
 class Human {
   String firstName;
@@ -16,6 +21,7 @@ class Human {
   Formation? currentlyLearning;
   List<Formation> listFormations = [];
   List<Alcool> alcoolAddict = [];
+  List<Rent> houses = [];
   bool isLearning = false;
   int happiness = 100;
   int balance = 0;
@@ -23,13 +29,22 @@ class Human {
   int? performancePro;
   List<JobOffer> career = [];
 
+  Country birthCountry;
+  Country nationality;
+  Country livingCountry;
+
+  bool parentsHouse = true;
+  bool parentsFree = true;
   bool canTherapy = true;
   bool canWorkHarder = true;
 
-  Human(this.firstName, this.lastName, this.age);
+  Human(this.firstName, this.lastName, this.age, this.birthCountry,
+      this.nationality, this.livingCountry);
 
-  ageUp() {
+  bool ageUp(BuildContext context, ValueChanged<int> update) {
+    bool vretour = false;
     StaticCarreer.regenerateJobOffer();
+    StaticHouse.generateRent();
 
     canWorkHarder = true;
     canTherapy = true;
@@ -40,7 +55,37 @@ class Human {
 
     ///Jour de paie !
     if (actualJobOffer != null) {
+      actualJobOffer!.yearsInPost++;
       balance += actualJobOffer!.salaire * 1000;
+    }
+
+    if (parentsFree == false) {
+      balance -= 3000;
+    }
+
+    if (houses.isNotEmpty) {
+      for (var element in houses) {
+        if (element.isBuying) {
+          if (element.duration > 0) {
+            element.duration--;
+            balance -= element.wage;
+          }
+        } else {
+          balance -= element.wage;
+        }
+      }
+    }
+
+    if (currentlyLearning == null && age >= 18 && parentsFree) {
+      parentsFree = false;
+      DataFeed.addEvent(
+          "Your parents asked you to pay a small rent as you are not learning anymore");
+    }
+
+    if (parentsHouse && age == 35) {
+      parentsFree = false;
+      parentsHouse = false;
+      DataFeed.addEvent("Your parents asked you to leave the house.");
     }
 
     ///Risque de licenciement
@@ -95,7 +140,14 @@ class Human {
         } else if (aimDegree == StaticDegree.high) {
           /// Choix Cursus ou dropout
           if (performancePro! > 60) {
-            setCurrentlyLearning(StaticFormations.formationComputerScience);
+            // ignore: unused_local_variable
+            Formation universityChoice = StaticFormations.listUniveristy[0];
+            showDialog(
+                context: context,
+                builder: (BuildContext context) => UniversityDialog(
+                      update: update,
+                    ));
+            vretour = true;
           } else {
             DataFeed.addEvent("My grades were too bad to apply to university");
             isLearning = false;
@@ -140,6 +192,8 @@ class Human {
         alcoolAddict.add(toAdd);
       }
     }
+
+    return vretour;
   }
 
   setCurrentlyLearning(Formation formation) {
@@ -148,7 +202,7 @@ class Human {
       updateHappiness(15, true);
     }
     if (performancePro != null) {
-      performancePro = performancePro! - 10;
+      updatePerformancePro(10, false);
     } else {
       performancePro = 40;
     }
@@ -163,6 +217,39 @@ class Human {
       currentlyLearning = null;
       performancePro = null;
       DataFeed.addEvent("I droped-out from school");
+    }
+  }
+
+  rentApply(Rent offer) {
+    int prob = 10;
+    if (actualJobOffer != null) {
+      prob += 50;
+      if (actualJobOffer!.salaire >= offer.wage * 2) {
+        prob += 20;
+      }
+    }
+
+    if (balance > offer.wage) {
+      prob += 10;
+    }
+
+    if (age < 25) {
+      prob -= 15;
+    }
+    int randnum = Random().nextInt(101);
+    if (randnum < prob) {
+      parentsHouse = false;
+      parentsFree = false;
+      houses.add(offer);
+      DataFeed.addEvent("I'm now renting a new " +
+          offer.house.name +
+          " in " +
+          offer.house.localisation!.name +
+          ".");
+      updateHappiness(15, true);
+    } else {
+      DataFeed.addEvent("My offer for the rent was refused.");
+      updateHappiness(5, false);
     }
   }
 
@@ -204,14 +291,26 @@ class Human {
           proba += 35;
         }
       }
-      if (offer.poste.previousPoste != null) {
+      if (offer.poste.previousPoste != null && actualJobOffer != null) {
         if (actualJobOffer!.poste == offer.poste.previousPoste) {
           proba += 35;
         }
       }
 
+      for (var element in career) {
+        if (element.poste == offer.poste.previousPoste) {
+          proba += 10;
+        }
+        if (element.poste == offer.poste) {
+          proba += 20;
+        }
+      }
+
       int randNum = Random().nextInt(101);
       if (randNum < proba) {
+        if (actualJobOffer != null) {
+          career.add(actualJobOffer!);
+        }
         updateHappiness(20, true);
         performancePro = 40;
         actualJobOffer = offer;
@@ -239,18 +338,26 @@ class Human {
     }
   }
 
+  updatePerformancePro(int increment, bool isPlus) {
+    if (isPlus) {
+      performancePro = performancePro! + increment;
+      performancePro! > 100 ? performancePro = 100 : true;
+    } else {
+      performancePro = performancePro! - increment;
+      performancePro! < 0 ? performancePro = 0 : true;
+    }
+  }
+
   workharder() {
     if (performancePro != null) {
       canWorkHarder = false;
       int randnum = Random().nextInt(101);
       if (randnum > 50) {
         DataFeed.addEvent("I've start working harder");
-        performancePro = performancePro! + 10;
+        updatePerformancePro(10, true);
       } else {
         DataFeed.addEvent("I tried to work harder but prefered to play.");
       }
-      performancePro! < 0 ? performancePro = 0 : true;
-      performancePro! > 100 ? performancePro = 100 : true;
     }
   }
 }
