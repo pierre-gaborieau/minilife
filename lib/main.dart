@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:minilife/Data/data_common.dart';
 import 'package:minilife/Data/static_house.dart';
+import 'package:minilife/Screens/all/professional_addons/actual_job.dart';
 import 'package:minilife/Screens/all/properties_addons/rent_house.dart';
 import 'package:minilife/Screens/screens.dart';
 
@@ -9,6 +10,7 @@ import 'Data/static_carreer.dart';
 
 void main() {
   runApp(const MyApp());
+  DataCommon.generateMainCharacter();
   StaticHouse.generateRent();
   DataFeed.addEvent("You were born as " +
       DataCommon.mainCharacter.firstName +
@@ -25,6 +27,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     StaticCarreer.updatePreviousPoste(StaticCarreer.computerScienceCarreer);
     StaticCarreer.updatePreviousPoste(StaticCarreer.restaurationCarreer);
+    StaticCarreer.updatePreviousPoste(StaticCarreer.journalismCarreer);
+    StaticCarreer.updatePreviousPoste(StaticCarreer.financialCarreer);
     return MaterialApp(
       initialRoute: '/',
       routes: {
@@ -34,6 +38,7 @@ class MyApp extends StatelessWidget {
         '/jobs': (context) => const JobsScreen(),
         '/specialcareers': (context) => const SpecialCareers(),
         '/cv': (context) => const CurriculumVitae(),
+        '/actual': (context) => const ActualJob(),
         //Properties Links
         '/houses': (context) => const HousesScreen(),
         '/rent': (context) => const RentHouse(),

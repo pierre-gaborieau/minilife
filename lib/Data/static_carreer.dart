@@ -11,6 +11,7 @@ import 'package:minilife/Model/Carreer/poste.dart';
 class StaticCarreer {
   static void updatePreviousPoste(Carreer carreer) {
     for (int i = 0; i < carreer.listPoste!.length; i++) {
+      carreer.listPoste![i].echelon = i;
       if (i > 0) {
         carreer.listPoste![i].previousPoste = carreer.listPoste![i - 1];
       }
@@ -121,6 +122,46 @@ class StaticCarreer {
         previousPoste: null),
   ]);
 
+  static Carreer journalismCarreer =
+      Carreer("Journalism", StaticMilieu.milieuJournalism, [
+    Poste(
+        nom: "Newspaper Distributor",
+        salaireMin: 12,
+        salaireMax: 18,
+        requirement: null,
+        previousPoste: null),
+    Poste(
+        nom: "Junior Photograph",
+        salaireMin: 15,
+        salaireMax: 20,
+        requirement: null,
+        previousPoste: null),
+    Poste(
+        nom: "Photograph",
+        salaireMin: 17,
+        salaireMax: 25,
+        requirement: null,
+        previousPoste: null),
+    Poste(
+        nom: "Junior Reporter",
+        salaireMin: 17,
+        salaireMax: 25,
+        requirement: StaticFormations.formationJournalism,
+        previousPoste: null),
+    Poste(
+        nom: "Reporter",
+        salaireMin: 19,
+        salaireMax: 29,
+        requirement: StaticFormations.formationJournalism,
+        previousPoste: null),
+    Poste(
+        nom: "Redactor",
+        salaireMin: 25,
+        salaireMax: 35,
+        requirement: StaticFormations.formationJournalism,
+        previousPoste: null),
+  ]);
+
   static List<JobOffer> jobOffer = [];
 
   static void regenerateJobOffer() {
@@ -135,6 +176,10 @@ class StaticCarreer {
       generateOffer(restaurationCarreer, DataEntreprise.listRestaurant),
       generateOffer(financialCarreer, DataEntreprise.financialList),
       generateOffer(financialCarreer, DataEntreprise.financialList),
+      generateOffer(journalismCarreer, DataEntreprise.journalismList),
+      generateOffer(journalismCarreer, DataEntreprise.journalismList),
+      generateOffer(journalismCarreer, DataEntreprise.journalismList),
+      generateOffer(journalismCarreer, DataEntreprise.journalismList),
     ];
   }
 

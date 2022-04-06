@@ -1,4 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+
+import 'package:minilife/Data/data_common.dart';
+import 'package:minilife/Data/static_country.dart';
+import 'package:minilife/Model/Country/country.dart';
+import 'package:minilife/Model/Country/country.dart';
 
 class MiscActions extends StatelessWidget {
   final ValueChanged<int> update;
@@ -17,6 +24,21 @@ class MiscActions extends StatelessWidget {
             title: const Text("Addiction Center"),
             onTap: () => _navigateToAddiction(context),
           ),
+          if (DataCommon.mainCharacter.age >= 18)
+            ListTile(
+                leading: const Icon(Icons.airplanemode_active_outlined),
+                title: const Text("Emigrate to another country"),
+                onTap: () {
+                  List<Country> tmpList = [];
+                  tmpList.addAll(StaticCountry.worldList);
+                  tmpList.remove(DataCommon.mainCharacter.livingCountry);
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) => DialogEmigrate(
+                            update: update,
+                            listCountry: tmpList,
+                          ));
+                }),
         ],
       ),
     );
@@ -28,5 +50,62 @@ class MiscActions extends StatelessWidget {
     if (translate == true) {
       update(2);
     }
+  }
+}
+
+class DialogEmigrate extends StatefulWidget {
+  final ValueChanged<int> update;
+  final List<Country> listCountry;
+  const DialogEmigrate({
+    Key? key,
+    required this.update,
+    required this.listCountry,
+  }) : super(key: key);
+
+  @override
+  State<DialogEmigrate> createState() => _DialogEmigrateState();
+}
+
+class _DialogEmigrateState extends State<DialogEmigrate> {
+  late Country countryChoice;
+  @override
+  void initState() {
+    countryChoice = widget.listCountry.first;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text("Emigrate"),
+      content: DropdownButton<Country>(
+        value: countryChoice,
+        items:
+            widget.listCountry.map<DropdownMenuItem<Country>>((Country item) {
+          return DropdownMenuItem<Country>(
+            child: Text(item.name),
+            value: item,
+          );
+        }).toList(),
+        onChanged: (item) {
+          setState(() {
+            countryChoice = item!;
+          });
+        },
+      ),
+      actions: [
+        TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text("Cancel")),
+        TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              DataCommon.mainCharacter.emigrate(countryChoice);
+              widget.update(2);
+            },
+            child: const Text("Emigrate"))
+      ],
+    );
   }
 }

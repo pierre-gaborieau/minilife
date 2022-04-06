@@ -58,6 +58,22 @@ class EducationScreen extends StatelessWidget {
                   Navigator.pop(context, true);
                   DataCommon.mainCharacter.dropOutSchool();
                 }),
+          if (DataCommon.mainCharacter.actualJobOffer != null &&
+              DataCommon.mainCharacter.actualJobOffer!.poste.requirement !=
+                  null &&
+              !DataCommon.mainCharacter.listFormations.contains(
+                  DataCommon.mainCharacter.actualJobOffer!.poste.requirement!))
+            ListTile(
+              leading: const Icon(Icons.school_outlined),
+              title: Text("Try to validate : " +
+                  DataCommon
+                      .mainCharacter.actualJobOffer!.poste.requirement!.nom),
+              onTap: () {
+                DataCommon.mainCharacter.validateSchoolRequirement(DataCommon
+                    .mainCharacter.actualJobOffer!.poste.requirement!);
+                Navigator.pop(context, true);
+              },
+            )
         ],
       ),
     );

@@ -6,6 +6,7 @@ class Poste {
   final int salaireMax;
   final Formation? requirement;
   Poste? previousPoste;
+  late int echelon;
 
   Poste({
     required this.nom,

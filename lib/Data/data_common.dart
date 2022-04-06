@@ -1,10 +1,22 @@
+import 'dart:math';
+
 import 'package:minilife/Data/static_country.dart';
 import 'package:minilife/Model/Alcool/alcool.dart';
+import 'package:minilife/Model/Country/country.dart';
 import 'package:minilife/Model/Human/human.dart';
 
 class DataCommon {
-  static Human mainCharacter = Human("Pierre", "Gaborieau", 0,
-      StaticCountry.france, StaticCountry.france, StaticCountry.france);
+  static void generateMainCharacter() {
+    Country country = StaticCountry
+        .worldList[Random().nextInt(StaticCountry.worldList.length + 1)];
+    String firstName =
+        country.firstName[Random().nextInt(country.firstName.length + 1)];
+    String lastName =
+        country.lastName[Random().nextInt(country.lastName.length + 1)];
+    mainCharacter = Human(firstName, lastName, 0, country, country, country);
+  }
+
+  static late Human mainCharacter;
 
   static List<Alcool> listAlcool = [
     Alcool(name: "Beer", danger: 1),

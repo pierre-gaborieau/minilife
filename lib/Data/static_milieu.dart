@@ -10,4 +10,7 @@ class StaticMilieu {
 
   static Milieu milieuEconomy =
       Milieu("Economy", const Icon(Icons.monetization_on));
+
+  static Milieu milieuJournalism =
+      Milieu("Journalism", const Icon(Icons.camera_enhance_outlined));
 }

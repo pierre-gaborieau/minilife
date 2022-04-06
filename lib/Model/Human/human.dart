@@ -45,6 +45,7 @@ class Human {
     bool vretour = false;
     StaticCarreer.regenerateJobOffer();
     StaticHouse.generateRent();
+    StaticCarreer.jobOffer.shuffle();
 
     canWorkHarder = true;
     canTherapy = true;
@@ -237,7 +238,7 @@ class Human {
       prob -= 15;
     }
     int randnum = Random().nextInt(101);
-    if (randnum < prob) {
+    if (randnum <= prob) {
       parentsHouse = false;
       parentsFree = false;
       houses.add(offer);
@@ -279,6 +280,32 @@ class Human {
     }
   }
 
+  validateSchoolRequirement(Formation formation) {
+    int proba = 20;
+    if (performancePro! > 20) {
+      proba += 10;
+    }
+    if (performancePro! > 40) {
+      proba += 10;
+    }
+    if (performancePro! > 60) {
+      proba += 20;
+    }
+    if (performancePro! > 80) {
+      proba += 20;
+    }
+    if (performancePro! == 100) {
+      proba == 100;
+    }
+    int randNum = Random().nextInt(101);
+    if (randNum <= proba) {
+      DataFeed.addEvent("I validate the " + formation.nom);
+      listFormations.add(formation);
+    } else {
+      DataFeed.addEvent("I failed to validate the " + formation.nom);
+    }
+  }
+
   jobInterview(JobOffer offer) {
     if (offer.alreadyAsk) {
       DataFeed.addEvent(
@@ -290,10 +317,18 @@ class Human {
         if (listFormations.contains(offer.poste.requirement!)) {
           proba += 35;
         }
+      } else {
+        proba += 35;
       }
       if (offer.poste.previousPoste != null && actualJobOffer != null) {
         if (actualJobOffer!.poste == offer.poste.previousPoste) {
           proba += 35;
+          if (performancePro! > 40) {
+            proba += 10;
+          }
+          if (performancePro! > 80) {
+            proba += 25;
+          }
         }
       }
 
@@ -307,7 +342,7 @@ class Human {
       }
 
       int randNum = Random().nextInt(101);
-      if (randNum < proba) {
+      if (randNum <= proba) {
         if (actualJobOffer != null) {
           career.add(actualJobOffer!);
         }
@@ -359,5 +394,53 @@ class Human {
         DataFeed.addEvent("I tried to work harder but prefered to play.");
       }
     }
+  }
+
+  void emigrate(Country countryChoice) {
+    int proba = 80;
+    int price = nextInt(0, 2500);
+
+    if (!countryChoice.bordersOpen) {
+      proba -= 30;
+      DataFeed.addEvent(countryChoice.name +
+          " has closed their borders. I have to ask for a Visa");
+    }
+
+    if (Random().nextInt(101) <= proba) {
+      if (balance > price) {
+        balance -= price;
+        DataFeed.addEvent("I was admit to " +
+            countryChoice.name +
+            ", the trip cost me " +
+            price.toString() +
+            " €");
+        updateHappiness(25, true);
+        if (actualJobOffer != null) {
+          DataFeed.addEvent(
+              "I had to leave my job since I doesn't leave anymore in " +
+                  livingCountry.name);
+          career.add(actualJobOffer!);
+          actualJobOffer = null;
+          updateHappiness(10, false);
+        }
+        parentsHouse = false;
+        livingCountry = countryChoice;
+        StaticHouse.generateRent();
+      } else {
+        DataFeed.addEvent("I was admit to " +
+            countryChoice.name +
+            " but I cannot afford the plane ticket...");
+        updateHappiness(10, false);
+      }
+    } else {
+      DataFeed.addEvent(
+          "I haven't been allowed to emigrate in " + countryChoice.name);
+      updateHappiness(15, false);
+    }
+  }
+
+  static int nextInt(int min, int max) {
+    int vretour = min + Random().nextInt(max - min);
+    return vretour;
   }
 }

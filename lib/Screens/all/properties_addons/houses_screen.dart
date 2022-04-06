@@ -27,7 +27,13 @@ class HousesScreen extends StatelessWidget {
                     "You are paying a 3k€ annual wage to your parents"),
               ),
             if (DataCommon.mainCharacter.parentsHouse == false &&
-                DataCommon.mainCharacter.houses.isEmpty)
+                    DataCommon.mainCharacter.houses.isEmpty ||
+                (DataCommon.mainCharacter.houses
+                        .where((element) =>
+                            element.house.localisation ==
+                            DataCommon.mainCharacter.livingCountry)
+                        .isEmpty &&
+                    !DataCommon.mainCharacter.parentsHouse))
               ListTile(
                 tileColor: Colors.grey[200],
                 leading: const Icon(Icons.highlight_remove_sharp),

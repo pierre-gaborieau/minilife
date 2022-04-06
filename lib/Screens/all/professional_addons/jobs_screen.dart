@@ -12,7 +12,6 @@ class JobsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     StaticCarreer.updatePreviousPoste(StaticCarreer.computerScienceCarreer);
-    StaticCarreer.jobOffer.shuffle();
     return Scaffold(
         appBar: AppBar(),
         body: ListView(

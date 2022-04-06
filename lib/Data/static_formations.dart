@@ -34,6 +34,11 @@ class StaticFormations {
   static Formation formationEconomy = Formation(
       nom: "Economy University", degree: StaticDegree.university, duration: 4);
 
+  static Formation formationJournalism = Formation(
+      nom: "Journalism University",
+      degree: StaticDegree.university,
+      duration: 4);
+
   static Formation formationGraduate = Formation(
     nom: "University Graduate",
     degree: StaticDegree.graduate,
@@ -42,6 +47,7 @@ class StaticFormations {
 
   static List<Formation> listUniveristy = [
     formationComputerScience,
-    formationEconomy
+    formationEconomy,
+    formationJournalism
   ];
 }

@@ -31,4 +31,15 @@ class DataEntreprise {
     Entreprise("RichBuilders", true, StaticMilieu.milieuEconomy),
     Entreprise("John Doe Foundation", true, StaticMilieu.milieuEconomy),
   ];
+
+  static List<Entreprise> journalismList = [
+    Entreprise("GameNews", false, StaticMilieu.milieuJournalism),
+    Entreprise("Metal Music", false, StaticMilieu.milieuJournalism),
+    Entreprise("SatyricNews", false, StaticMilieu.milieuJournalism),
+    Entreprise("People Newz", true, StaticMilieu.milieuJournalism),
+    Entreprise("National Report", true, StaticMilieu.milieuJournalism),
+    Entreprise("The Expert", true, StaticMilieu.milieuJournalism),
+    Entreprise("Politizer", true, StaticMilieu.milieuJournalism),
+    Entreprise("InternationalNews", true, StaticMilieu.milieuJournalism),
+  ];
 }
