@@ -58,12 +58,32 @@ class Human {
     if (actualJobOffer != null) {
       actualJobOffer!.yearsInPost++;
       balance += actualJobOffer!.salaire * 1000;
+
+      //gestion augmentation
+      int probaAugmentation = 10;
+      if (performancePro! > 40) probaAugmentation += 5;
+      if (performancePro! > 50) probaAugmentation += 5;
+      if (performancePro! > 60) probaAugmentation += 10;
+      if (performancePro! > 70) probaAugmentation += 10;
+      if (performancePro! > 80) probaAugmentation += 10;
+      if (performancePro! > 90) probaAugmentation += 5;
+      if (performancePro! == 100) probaAugmentation += 5;
+      if (Random().nextInt(101) <= probaAugmentation) {
+        int newSalaire = nextInt((actualJobOffer!.salaire * 1.01).toInt(),
+            (actualJobOffer!.salaire * 2).toInt());
+        actualJobOffer!.salaire = newSalaire;
+        DataFeed.addEvent("I got a payrise. I'm now paid " +
+            newSalaire.toString() +
+            " € yearly");
+      }
     }
 
+    ///Paie du loyer aux parents
     if (parentsFree == false && parentsHouse == true) {
       balance -= 3000;
     }
 
+    //Paie des loyers et prets
     if (houses.isNotEmpty) {
       for (var element in houses) {
         if (element.isBuying) {
@@ -77,12 +97,14 @@ class Human {
       }
     }
 
+    //Début du loyer à ses parents
     if (currentlyLearning == null && age >= 18 && parentsFree) {
       parentsFree = false;
       DataFeed.addEvent(
           "Your parents asked you to pay a small rent as you are not learning anymore");
     }
 
+    //Expulsion des parents
     if (parentsHouse && age == 35) {
       parentsFree = false;
       parentsHouse = false;
@@ -144,6 +166,7 @@ class Human {
             // ignore: unused_local_variable
             Formation universityChoice = StaticFormations.listUniveristy[0];
             showDialog(
+                barrierDismissible: false,
                 context: context,
                 builder: (BuildContext context) => UniversityDialog(
                       update: update,
@@ -193,7 +216,6 @@ class Human {
         alcoolAddict.add(toAdd);
       }
     }
-
     return vretour;
   }
 
@@ -311,8 +333,11 @@ class Human {
       DataFeed.addEvent(
           offer.entreprise.nom + " asked me to stop calling them for the job");
     } else {
+      //Impossible de postuler deux fois à la meme offre
       offer.alreadyAsk = true;
       int proba = 10;
+
+      //Gestion des prérequis scolaires
       if (offer.poste.requirement != null) {
         if (listFormations.contains(offer.poste.requirement!)) {
           proba += 35;
@@ -320,6 +345,8 @@ class Human {
       } else {
         proba += 35;
       }
+
+      //Si postuler au meme poste
       if (offer.poste.previousPoste != null && actualJobOffer != null) {
         if (actualJobOffer!.poste == offer.poste.previousPoste) {
           proba += 35;
@@ -332,12 +359,27 @@ class Human {
         }
       }
 
+      bool previous = false;
+      bool same = false;
+      bool upper = false;
       for (var element in career) {
-        if (element.poste == offer.poste.previousPoste) {
+        //Si le poste requis à déjà été occupé
+        if (!previous && (element.poste == offer.poste.previousPoste)) {
+          previous = true;
           proba += 10;
         }
-        if (element.poste == offer.poste) {
+        //Si le dernier poste est le même
+        if (!same && (element.poste == offer.poste)) {
+          same = true;
           proba += 20;
+        }
+
+        //poste supérieur déjà occupé
+        if (!upper && (element.entreprise.milieu == offer.entreprise.milieu)) {
+          if (element.poste.echelon > offer.poste.echelon) {
+            upper = true;
+            proba += 20;
+          }
         }
       }
 

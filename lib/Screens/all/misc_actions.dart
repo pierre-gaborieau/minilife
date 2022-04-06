@@ -29,6 +29,7 @@ class MiscActions extends StatelessWidget {
                   tmpList.addAll(StaticCountry.worldList);
                   tmpList.remove(DataCommon.mainCharacter.livingCountry);
                   showDialog(
+                      barrierDismissible: false,
                       context: context,
                       builder: (BuildContext context) => DialogEmigrate(
                             update: update,
