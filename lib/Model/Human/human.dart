@@ -29,13 +29,18 @@ class Human {
   int? performancePro;
   List<JobOffer> career = [];
 
+  int yearsOfWork = 0;
+  double unemployment = 1;
   Country birthCountry;
   Country nationality;
   Country livingCountry;
+  late int yearsOfEmigrate;
+  late int retirementAid;
 
   bool canAugment = true;
   int yearsBeforeAugment = 0;
 
+  bool retired = false;
   bool parentsHouse = true;
   bool parentsFree = true;
   bool canTherapy = true;
@@ -57,8 +62,16 @@ class Human {
     age++;
     DataFeed.addEvent("\n\n" + age.toString() + " years old");
 
+    if (livingCountry != nationality) yearsOfEmigrate++;
+
+    if (retired) {
+      balance += retirementAid;
+    }
+
     ///Jour de paie !
     if (actualJobOffer != null) {
+      yearsOfWork++;
+      unemployment = unemployment + 0.5;
       actualJobOffer!.yearsInPost++;
       balance += actualJobOffer!.salaire * 1000;
 
@@ -81,11 +94,24 @@ class Human {
           DataFeed.addEvent("I got a payrise. I'm now paid " +
               newSalaire.toString() +
               "k € yearly");
+          updateHappiness(15, true);
         }
       } else {
         yearsBeforeAugment--;
         if (yearsBeforeAugment == 0) {
           canAugment = true;
+        }
+      }
+    } else {
+      if (currentlyLearning == null && age > 18) {
+        if (unemployment >= 1) {
+          unemployment--;
+          int value = 9600;
+          DataFeed.addEvent(
+              "I received " + value.toString() + " € of unemployment aid");
+          balance += value;
+        } else {
+          DataFeed.addEvent("I am not eligible to receive unemployment aid");
         }
       }
     }
@@ -202,6 +228,12 @@ class Human {
       }
     }
 
+    if ((yearsOfWork == 43 || age == 70) && !retired) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) => RetirementDialog(update: update));
+    }
+
     ///Gestion addiction alcool
     if (age > 13 && DataCommon.listAlcool.length > alcoolAddict.length) {
       //Pourcentage de chance de tomber alcoolique
@@ -227,6 +259,30 @@ class Human {
       }
     }
     return vretour;
+  }
+
+  askCitizenship() {
+    int proba = 10;
+    if (actualJobOffer != null) proba += 10;
+    if (houses
+        .where((element) => element.house.localisation == livingCountry)
+        .isNotEmpty) proba += 10;
+    if (yearsOfEmigrate > 2) proba += 5;
+    if (yearsOfEmigrate > 5) proba += 10;
+    if (yearsOfEmigrate > 10) proba += 15;
+    if (yearsOfEmigrate > 20) proba += 20;
+
+    if (Random().nextInt(101) <= proba) {
+      DataFeed.addEvent("I'm no longer a citizen of " +
+          nationality.name +
+          ", I am now officialy living in " +
+          livingCountry.name);
+      updateHappiness(10, true);
+      nationality = livingCountry;
+    } else {
+      DataFeed.addEvent("My request to become Citizen has been refused");
+      updateHappiness(10, false);
+    }
   }
 
   setCurrentlyLearning(Formation formation) {
@@ -457,6 +513,8 @@ class Human {
     int proba = 80;
     int price = nextInt(0, 2500);
 
+    if (countryChoice == nationality) proba == 100;
+
     if (!countryChoice.bordersOpen) {
       proba -= 30;
       DataFeed.addEvent(countryChoice.name +
@@ -482,6 +540,7 @@ class Human {
         }
         parentsHouse = false;
         livingCountry = countryChoice;
+        yearsOfEmigrate = 0;
         StaticHouse.generateRent();
       } else {
         DataFeed.addEvent("I was admit to " +
@@ -499,5 +558,29 @@ class Human {
   static int nextInt(int min, int max) {
     int vretour = min + Random().nextInt(max - min);
     return vretour;
+  }
+
+  void retire() {
+    late int lowest;
+    late int highest;
+
+    for (int i = 0; i < career.length; i++) {
+      if (i == 0) {
+        lowest = career[i].salaire;
+        highest = career[i].salaire;
+      } else {
+        if (career[i].salaire < lowest) {
+          lowest = career[i].salaire;
+        } else if (career[i].salaire > highest) {
+          highest = career[i].salaire;
+        }
+      }
+    }
+
+    retirementAid = ((lowest + highest) / 2 * 0.8).toInt();
+    retired = true;
+    DataFeed.addEvent("I am now retired. I will receive an annual aid of : " +
+        retirementAid.toString() +
+        "k €");
   }
 }

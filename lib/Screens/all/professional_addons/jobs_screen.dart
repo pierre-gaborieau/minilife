@@ -17,10 +17,11 @@ class JobsScreen extends StatelessWidget {
         body: ListView(
           children: [
             if (DataCommon.mainCharacter.age < StaticCarreer.minAgeTravail ||
-                DataCommon.mainCharacter.isLearning)
+                DataCommon.mainCharacter.isLearning ||
+                DataCommon.mainCharacter.retired)
               ListTile(
                 tileColor: Colors.grey[200],
-                leading: const Icon(Icons.school_outlined),
+                leading: const Icon(Icons.cancel),
                 title: const Text("You are not able to get a job."),
               ),
             if (DataCommon.mainCharacter.actualJobOffer != null)
@@ -65,7 +66,8 @@ class JobsScreen extends StatelessWidget {
                 onTap: () {
                   if (DataCommon.mainCharacter.age >=
                           StaticCarreer.minAgeTravail &&
-                      !DataCommon.mainCharacter.isLearning) {
+                      !DataCommon.mainCharacter.isLearning &&
+                      !DataCommon.mainCharacter.retired) {
                     JobOffer offer = StaticCarreer.jobOffer[i];
                     String schoolRequirements = offer.poste.requirement == null
                         ? "none"
@@ -75,7 +77,7 @@ class JobsScreen extends StatelessWidget {
                         : offer.poste.previousPoste!.nom;
                     showDialog(
                         context: context,
-                        builder: (BuildContext context) => AlertDialog(
+                        builder: (BuildContext context2) => AlertDialog(
                               title: Text(offer.poste.nom),
                               content: Text("Company : " +
                                   offer.entreprise.nom +
@@ -88,14 +90,16 @@ class JobsScreen extends StatelessWidget {
                               actions: [
                                 TextButton(
                                   onPressed: () =>
-                                      Navigator.pop(context, 'Cancel'),
+                                      Navigator.pop(context2, 'Cancel'),
                                   child: const Text('Cancel'),
                                 ),
                                 TextButton(
                                   onPressed: () {
                                     DataCommon.mainCharacter
                                         .jobInterview(offer);
-                                    Navigator.pop(context, true);
+                                    Navigator.pop(
+                                      context2,
+                                    );
                                     Navigator.pop(context, true);
                                   },
                                   child: const Text('Take an interview'),

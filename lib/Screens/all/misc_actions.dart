@@ -20,6 +20,33 @@ class MiscActions extends StatelessWidget {
             title: const Text("Addiction Center"),
             onTap: () => _navigateToAddiction(context),
           ),
+          if (DataCommon.mainCharacter.livingCountry !=
+              DataCommon.mainCharacter.nationality)
+            ListTile(
+              leading: const Icon(Icons.cached_rounded),
+              title: const Text("Apply for a new nationality"),
+              onTap: () {
+                showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                          content: const Text(
+                              "Do you really want to apply for a nationality change ?"),
+                          actions: [
+                            TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text("Cancel")),
+                            TextButton(
+                                onPressed: () {
+                                  DataCommon.mainCharacter.askCitizenship();
+                                  Navigator.pop(context);
+                                  update(2);
+                                },
+                                child: const Text("Apply"))
+                          ],
+                        ));
+              },
+            ),
           if (DataCommon.mainCharacter.age >= 18)
             ListTile(
                 leading: const Icon(Icons.airplanemode_active_outlined),
