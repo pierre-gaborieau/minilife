@@ -33,6 +33,9 @@ class Human {
   Country nationality;
   Country livingCountry;
 
+  bool canAugment = true;
+  int yearsBeforeAugment = 0;
+
   bool parentsHouse = true;
   bool parentsFree = true;
   bool canTherapy = true;
@@ -60,21 +63,30 @@ class Human {
       balance += actualJobOffer!.salaire * 1000;
 
       //gestion augmentation
-      int probaAugmentation = 10;
-      if (performancePro! > 40) probaAugmentation += 5;
-      if (performancePro! > 50) probaAugmentation += 5;
-      if (performancePro! > 60) probaAugmentation += 10;
-      if (performancePro! > 70) probaAugmentation += 10;
-      if (performancePro! > 80) probaAugmentation += 10;
-      if (performancePro! > 90) probaAugmentation += 5;
-      if (performancePro! == 100) probaAugmentation += 5;
-      if (Random().nextInt(101) <= probaAugmentation) {
-        int newSalaire = nextInt((actualJobOffer!.salaire * 1.01).toInt(),
-            (actualJobOffer!.salaire * 2).toInt());
-        actualJobOffer!.salaire = newSalaire;
-        DataFeed.addEvent("I got a payrise. I'm now paid " +
-            newSalaire.toString() +
-            " € yearly");
+      if (canAugment) {
+        int probaAugmentation = 10;
+        if (performancePro! > 40) probaAugmentation += 5;
+        if (performancePro! > 50) probaAugmentation += 5;
+        if (performancePro! > 60) probaAugmentation += 10;
+        if (performancePro! > 70) probaAugmentation += 10;
+        if (performancePro! > 80) probaAugmentation += 10;
+        if (performancePro! > 90) probaAugmentation += 5;
+        if (performancePro! == 100) probaAugmentation += 5;
+        if (Random().nextInt(101) <= probaAugmentation) {
+          canAugment = false;
+          yearsBeforeAugment = 5;
+          int newSalaire = nextInt((actualJobOffer!.salaire * 1.01).toInt(),
+              (actualJobOffer!.salaire * 2).toInt());
+          actualJobOffer!.salaire = newSalaire;
+          DataFeed.addEvent("I got a payrise. I'm now paid " +
+              newSalaire.toString() +
+              "k € yearly");
+        }
+      } else {
+        yearsBeforeAugment--;
+        if (yearsBeforeAugment == 0) {
+          canAugment = true;
+        }
       }
     }
 
@@ -134,8 +146,8 @@ class Human {
         DataFeed.addEvent(
             "I have been laid off " + actualJobOffer!.entreprise.nom);
         updateHappiness(20, false);
-        performancePro = null;
         actualJobOffer = null;
+        canAugment = true;
       }
     }
 
@@ -176,7 +188,6 @@ class Human {
             DataFeed.addEvent("My grades were too bad to apply to university");
             isLearning = false;
             currentlyLearning = null;
-            performancePro = null;
           }
         } else if (aimDegree == StaticDegree.university) {
           /// Choix Graduate ou dropout
@@ -186,7 +197,6 @@ class Human {
             DataFeed.addEvent("My grades were too bad to apply to a graduate");
             isLearning = false;
             currentlyLearning = null;
-            performancePro = null;
           }
         }
       }
@@ -389,7 +399,12 @@ class Human {
           career.add(actualJobOffer!);
         }
         updateHappiness(20, true);
-        performancePro = 40;
+        if (performancePro != null) {
+          performancePro =
+              nextInt((performancePro! * 0.8).toInt(), performancePro!);
+        } else {
+          performancePro = 40;
+        }
         actualJobOffer = offer;
         DataFeed.addEvent("I've start a new job as a " +
             offer.poste.nom +
