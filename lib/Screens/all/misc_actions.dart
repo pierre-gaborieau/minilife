@@ -1,10 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-
 import 'package:minilife/Data/data_common.dart';
 import 'package:minilife/Data/static_country.dart';
-import 'package:minilife/Model/Country/country.dart';
 import 'package:minilife/Model/Country/country.dart';
 
 class MiscActions extends StatelessWidget {
@@ -68,8 +64,10 @@ class DialogEmigrate extends StatefulWidget {
 
 class _DialogEmigrateState extends State<DialogEmigrate> {
   late Country countryChoice;
+
   @override
   void initState() {
+    super.initState();
     countryChoice = widget.listCountry.first;
   }
 

@@ -1,6 +1,5 @@
 import 'package:minilife/Model/Carreer/entreprise.dart';
 import 'package:minilife/Model/Carreer/poste.dart';
-import 'package:minilife/Model/Country/country.dart';
 
 class JobOffer {
   final Entreprise entreprise;

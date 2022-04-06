@@ -60,7 +60,7 @@ class Human {
       balance += actualJobOffer!.salaire * 1000;
     }
 
-    if (parentsFree == false) {
+    if (parentsFree == false && parentsHouse == true) {
       balance -= 3000;
     }
 
