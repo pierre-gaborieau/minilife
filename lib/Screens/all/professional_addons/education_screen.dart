@@ -55,8 +55,25 @@ class EducationScreen extends StatelessWidget {
                 leading: const Icon(Icons.cancel),
                 title: const Text("Dropout School"),
                 onTap: () {
-                  Navigator.pop(context, true);
-                  DataCommon.mainCharacter.dropOutSchool();
+                  showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (BuildContext context2) => AlertDialog(
+                            content: const Text(
+                                "Do you really want to drop-out school ?\nYou won't be able to get back to it."),
+                            actions: [
+                              TextButton(
+                                  onPressed: () => Navigator.pop(context2),
+                                  child: const Text("Cancel")),
+                              TextButton(
+                                  onPressed: () {
+                                    DataCommon.mainCharacter.dropOutSchool();
+                                    Navigator.pop(context);
+                                    Navigator.pop(context, true);
+                                  },
+                                  child: const Text("Drop-out"))
+                            ],
+                          ));
                 }),
           if (DataCommon.mainCharacter.actualJobOffer != null &&
               DataCommon.mainCharacter.actualJobOffer!.poste.requirement !=
