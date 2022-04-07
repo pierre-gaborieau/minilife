@@ -7,102 +7,114 @@ import 'package:minilife/Data/static_degree.dart';
 import 'package:minilife/Data/static_formations.dart';
 import 'package:minilife/Data/static_house.dart';
 import 'package:minilife/Model/Alcool/alcool.dart';
+import 'package:minilife/Model/Carreer/carreer.dart';
 import 'package:minilife/Model/Carreer/job_offer.dart';
+import 'package:minilife/Model/Carreer/poste.dart';
 import 'package:minilife/Model/Country/country.dart';
+import 'package:minilife/Model/Health/regime.dart';
 import 'package:minilife/Model/Houses/rent.dart';
 import 'package:minilife/Model/School/degree.dart';
 import 'package:minilife/Model/School/formation.dart';
 import 'package:minilife/Screens/all/home_screen.dart';
 
 class Human {
+  //Base infos
   String firstName;
   String lastName;
   int age;
-  Formation? currentlyLearning;
-  List<Formation> listFormations = [];
-  List<Alcool> alcoolAddict = [];
-  List<Rent> houses = [];
-  bool isLearning = false;
   int happiness = 100;
   int balance = 0;
-  JobOffer? actualJobOffer;
+  int health;
+  bool male;
+
+  //Health info
+  Regime regime;
+
+  //School/Work infos
+  Formation? currentlyLearning;
+  List<Formation> listFormations = [];
+  bool isLearning = false;
   int? performancePro;
   List<JobOffer> career = [];
-
   int yearsOfWork = 0;
   double unemployment = 1;
+  late int retirementAid;
+  bool canAugment = true;
+  int yearsBeforeAugment = 0;
+  late bool askPayRise;
+  bool retired = false;
+  JobOffer? actualJobOffer;
+  bool canWorkHarder = true;
+
+  //Addictions Info
+  List<Alcool> alcoolAddict = [];
+  bool canTherapy = true;
+  bool canLottery = true;
+
+  //Country Info
   Country birthCountry;
   Country nationality;
   Country livingCountry;
   late int yearsOfEmigrate;
-  late int retirementAid;
 
-  bool canAugment = true;
-  int yearsBeforeAugment = 0;
-
-  bool retired = false;
+  //Houses Info
   bool parentsHouse = true;
   bool parentsFree = true;
-  bool canTherapy = true;
-  bool canWorkHarder = true;
+  List<Rent> houses = [];
 
-  Human(this.firstName, this.lastName, this.age, this.birthCountry,
-      this.nationality, this.livingCountry);
+  Human(this.firstName, this.lastName, this.male, this.age, this.health,
+      this.regime, this.birthCountry, this.nationality, this.livingCountry);
 
   bool ageUp(BuildContext context, ValueChanged<int> update) {
+    canLottery = true;
+    askPayRise = true;
     bool vretour = false;
     StaticCarreer.regenerateJobOffer();
     StaticHouse.generateRent();
+    StaticHouse.generateSell();
     StaticCarreer.jobOffer.shuffle();
 
     canWorkHarder = true;
     canTherapy = true;
     //gestion du bonheur
-    updateHappiness(3 + alcoolAddict.length, false);
+    updateHappiness(-(3 + alcoolAddict.length));
     age++;
     DataFeed.addEvent("\n\n" + age.toString() + " years old");
+
+    //gestion du regime
+    updateHealth(regime.health);
+    updateHappiness(regime.happinness);
+    if (!parentsHouse) balance -= regime.price;
 
     if (livingCountry != nationality) yearsOfEmigrate++;
 
     if (retired) {
-      balance += retirementAid;
+      balance += retirementAid * 1000;
+    }
+
+    if (performancePro != null && performancePro! > 0) {
+      performancePro = nextInt(
+          (performancePro! * 0.9).toInt(), (performancePro! * 1.1).toInt());
+      updatePerformancePro(0);
     }
 
     ///Jour de paie !
     if (actualJobOffer != null) {
       yearsOfWork++;
-      unemployment = unemployment + 0.5;
+      unemployment = unemployment + 1 / 3;
       actualJobOffer!.yearsInPost++;
       balance += actualJobOffer!.salaire * 1000;
 
       //gestion augmentation
       if (canAugment) {
-        int probaAugmentation = 10;
-        if (performancePro! > 40) probaAugmentation += 5;
-        if (performancePro! > 50) probaAugmentation += 5;
-        if (performancePro! > 60) probaAugmentation += 10;
-        if (performancePro! > 70) probaAugmentation += 10;
-        if (performancePro! > 80) probaAugmentation += 10;
-        if (performancePro! > 90) probaAugmentation += 5;
-        if (performancePro! == 100) probaAugmentation += 5;
-        if (Random().nextInt(101) <= probaAugmentation) {
-          canAugment = false;
-          yearsBeforeAugment = 5;
-          int newSalaire = nextInt((actualJobOffer!.salaire * 1.01).toInt(),
-              (actualJobOffer!.salaire * 2).toInt());
-          actualJobOffer!.salaire = newSalaire;
-          DataFeed.addEvent("I got a payrise. I'm now paid " +
-              newSalaire.toString() +
-              "k € yearly");
-          updateHappiness(15, true);
-        }
+        askPayrise(false);
       } else {
         yearsBeforeAugment--;
         if (yearsBeforeAugment == 0) {
           canAugment = true;
         }
       }
-    } else {
+    } else if (!retired) {
       if (currentlyLearning == null && age > 18) {
         if (unemployment >= 1) {
           unemployment--;
@@ -125,6 +137,8 @@ class Human {
     if (houses.isNotEmpty) {
       for (var element in houses) {
         if (element.isBuying) {
+          element.house.value = nextInt((element.house.value * 0.9).toInt(),
+              (element.house.value * 1.1).toInt());
           if (element.duration > 0) {
             element.duration--;
             balance -= element.wage;
@@ -171,7 +185,7 @@ class Human {
         career.add(actualJobOffer!);
         DataFeed.addEvent(
             "I have been laid off " + actualJobOffer!.entreprise.nom);
-        updateHappiness(20, false);
+        updateHappiness(-20);
         actualJobOffer = null;
         canAugment = true;
       }
@@ -258,6 +272,14 @@ class Human {
         alcoolAddict.add(toAdd);
       }
     }
+
+    if (!parentsHouse &&
+        houses
+            .where((element) => element.house.localisation == livingCountry)
+            .isEmpty) updateHealth(-10);
+
+    updateHealth(-alcoolAddict.length * 2);
+
     return vretour;
   }
 
@@ -277,21 +299,21 @@ class Human {
           nationality.name +
           ", I am now officialy living in " +
           livingCountry.name);
-      updateHappiness(10, true);
+      updateHappiness(10);
       nationality = livingCountry;
     } else {
       DataFeed.addEvent("My request to become Citizen has been refused");
-      updateHappiness(10, false);
+      updateHappiness(-10);
     }
   }
 
   setCurrentlyLearning(Formation formation) {
     if (currentlyLearning != null) {
       DataFeed.addEvent("I graduated from " + currentlyLearning!.nom);
-      updateHappiness(15, true);
+      updateHappiness(15);
     }
     if (performancePro != null) {
-      updatePerformancePro(10, false);
+      updatePerformancePro(-Random().nextInt(11));
     } else {
       performancePro = 40;
     }
@@ -304,7 +326,6 @@ class Human {
     if (age >= StaticFormations.minDropOutAge) {
       isLearning = false;
       currentlyLearning = null;
-      performancePro = null;
       DataFeed.addEvent("I droped-out from school");
     }
   }
@@ -335,10 +356,10 @@ class Human {
           " in " +
           offer.house.localisation!.name +
           ".");
-      updateHappiness(15, true);
+      updateHappiness(15);
     } else {
       DataFeed.addEvent("My offer for the rent was refused.");
-      updateHappiness(5, false);
+      updateHappiness(-5);
     }
   }
 
@@ -358,7 +379,7 @@ class Human {
       if (randnum <= proba) {
         alcoolAddict.remove(alcool);
         DataFeed.addEvent("I managed to stop " + alcool.name);
-        updateHappiness(10, true);
+        updateHappiness(10);
       } else {
         DataFeed.addEvent("I failed to stop " + alcool.name);
       }
@@ -407,6 +428,16 @@ class Human {
       if (offer.poste.requirement != null) {
         if (listFormations.contains(offer.poste.requirement!)) {
           proba += 35;
+          if (offer.poste.carreer.listPoste!
+              .where((element) => element.echelon == offer.poste.echelon - 1)
+              .isNotEmpty) {
+            Poste previousEchelon = offer.poste.carreer.listPoste!
+                .where((element) => element.echelon == offer.poste.echelon - 1)
+                .first;
+            if (previousEchelon.requirement == null) {
+              proba += 35;
+            }
+          }
         }
       } else {
         proba += 35;
@@ -454,8 +485,9 @@ class Human {
         if (actualJobOffer != null) {
           career.add(actualJobOffer!);
         }
-        updateHappiness(20, true);
+        updateHappiness(20);
         if (performancePro != null) {
+          if (performancePro! <= 0) performancePro = 1;
           performancePro =
               nextInt((performancePro! * 0.8).toInt(), performancePro!);
         } else {
@@ -467,7 +499,7 @@ class Human {
             " at " +
             offer.entreprise.nom);
       } else {
-        updateHappiness(10, false);
+        updateHappiness(-10);
         DataFeed.addEvent("I didn't get the job of " +
             offer.poste.nom +
             " at " +
@@ -476,24 +508,23 @@ class Human {
     }
   }
 
-  updateHappiness(int increment, bool isPlus) {
-    if (isPlus) {
-      happiness += increment;
-      happiness > 100 ? happiness = 100 : true;
-    } else {
-      happiness -= increment;
-      happiness < 0 ? happiness = 0 : true;
-    }
+  updateHappiness(int increment) {
+    happiness += increment;
+    happiness >= 100 ? happiness = 100 : true;
+
+    happiness <= 0 ? happiness = 0 : true;
   }
 
-  updatePerformancePro(int increment, bool isPlus) {
-    if (isPlus) {
-      performancePro = performancePro! + increment;
-      performancePro! > 100 ? performancePro = 100 : true;
-    } else {
-      performancePro = performancePro! - increment;
-      performancePro! < 0 ? performancePro = 0 : true;
-    }
+  updatePerformancePro(int increment) {
+    performancePro = performancePro! + increment;
+    performancePro! >= 100 ? performancePro = 100 : true;
+    performancePro! <= 0 ? performancePro = 0 : true;
+  }
+
+  updateHealth(int increment) {
+    health = health + increment;
+    health >= 100 ? health = 100 : true;
+    health <= 0 ? health = 0 : true;
   }
 
   workharder() {
@@ -502,7 +533,7 @@ class Human {
       int randnum = Random().nextInt(101);
       if (randnum > 50) {
         DataFeed.addEvent("I've start working harder");
-        updatePerformancePro(10, true);
+        updatePerformancePro(nextInt(1, 20));
       } else {
         DataFeed.addEvent("I tried to work harder but prefered to play.");
       }
@@ -529,29 +560,30 @@ class Human {
             ", the trip cost me " +
             price.toString() +
             " €");
-        updateHappiness(25, true);
+        updateHappiness(25);
         if (actualJobOffer != null) {
           DataFeed.addEvent(
               "I had to leave my job since I doesn't leave anymore in " +
                   livingCountry.name);
           career.add(actualJobOffer!);
           actualJobOffer = null;
-          updateHappiness(10, false);
+          updateHappiness(-10);
         }
         parentsHouse = false;
         livingCountry = countryChoice;
         yearsOfEmigrate = 0;
+        StaticHouse.generateSell();
         StaticHouse.generateRent();
       } else {
         DataFeed.addEvent("I was admit to " +
             countryChoice.name +
             " but I cannot afford the plane ticket...");
-        updateHappiness(10, false);
+        updateHappiness(-10);
       }
     } else {
       DataFeed.addEvent(
           "I haven't been allowed to emigrate in " + countryChoice.name);
-      updateHappiness(15, false);
+      updateHappiness(-15);
     }
   }
 
@@ -563,7 +595,10 @@ class Human {
   void retire() {
     late int lowest;
     late int highest;
-
+    if (actualJobOffer != null) {
+      career.add(actualJobOffer!);
+      actualJobOffer = null;
+    }
     for (int i = 0; i < career.length; i++) {
       if (i == 0) {
         lowest = career[i].salaire;
@@ -582,5 +617,174 @@ class Human {
     DataFeed.addEvent("I am now retired. I will receive an annual aid of : " +
         retirementAid.toString() +
         "k €");
+  }
+
+  void resign() {
+    DataFeed.addEvent("I resigned from my job");
+    updatePerformancePro(-Random().nextInt(11));
+    career.add(actualJobOffer!);
+    actualJobOffer = null;
+  }
+
+  void askPayrise(bool isAsk) {
+    if (actualJobOffer!.salaire < actualJobOffer!.poste.salaireMax) {
+      if (!isAsk || (isAsk && askPayRise)) {
+        askPayRise = false;
+        int probaAugmentation = 10;
+        if (performancePro! > 40) probaAugmentation += 5;
+        if (performancePro! > 50) probaAugmentation += 5;
+        if (performancePro! > 60) probaAugmentation += 10;
+        if (performancePro! > 70) probaAugmentation += 10;
+        if (performancePro! > 80) probaAugmentation += 10;
+        if (performancePro! > 90) probaAugmentation += 5;
+        if (performancePro! == 100) probaAugmentation += 5;
+        if (Random().nextInt(101) <= probaAugmentation) {
+          canAugment = false;
+          yearsBeforeAugment = 5;
+          int newSalaire = nextInt((actualJobOffer!.salaire * 1.01).toInt(),
+              (actualJobOffer!.salaire * 2).toInt());
+          actualJobOffer!.salaire = newSalaire;
+          DataFeed.addEvent("I got a payrise. I'm now paid " +
+              newSalaire.toString() +
+              "k € yearly");
+          updateHappiness(15);
+        } else if (isAsk) {
+          DataFeed.addEvent("I didn't got my payrise.");
+          updateHappiness(-5);
+        }
+      } else {
+        DataFeed.addEvent("I didn't got my payrise.");
+      }
+    } else {
+      if (isAsk) {
+        DataFeed.addEvent(
+            "I was eligible for a payrise but I already have the maximum salary");
+      }
+    }
+  }
+
+  void askPromotion() {
+    Carreer carreer = actualJobOffer!.poste.carreer;
+
+    if (actualJobOffer!.poste.echelon < carreer.listPoste!.last.echelon) {
+      Poste newPoste = carreer.listPoste!
+          .where(
+              (element) => element.echelon == actualJobOffer!.poste.echelon + 1)
+          .first;
+
+      int proba = 10;
+      if (actualJobOffer!.yearsInPost >= 5) proba += 5;
+      if (actualJobOffer!.yearsInPost >= 10) proba += 15;
+
+      if (performancePro! < 50) proba -= 10;
+      if (performancePro! > 70) proba += 20;
+      if (performancePro! > 80) proba += 10;
+
+      if (Random().nextInt(101) <= proba) {
+        JobOffer newJobOffer = JobOffer(
+            entreprise: actualJobOffer!.entreprise,
+            poste: newPoste,
+            salaire: nextInt((actualJobOffer!.salaire * 1.1).toInt(),
+                (actualJobOffer!.salaire * 1.5).toInt()));
+
+        DataFeed.addEvent("I have been promoted to " + newPoste.nom);
+        career.add(actualJobOffer!);
+        actualJobOffer = newJobOffer;
+        updateHappiness(10);
+      } else {
+        DataFeed.addEvent("I didn't got my promotion");
+        updateHappiness(5);
+      }
+    } else {
+      DataFeed.addEvent("You are already at the climax of this carreer");
+    }
+  }
+
+  void cancelRent(Rent house) {
+    DataFeed.addEvent("I leaved my " + house.house.name + " rental.");
+    houses.remove(house);
+    if (age < 35 && livingCountry == birthCountry) {
+      DataFeed.addEvent("I went back to my parents house");
+      parentsHouse = true;
+      parentsFree = true;
+    }
+  }
+
+  void buyHouse(Rent temp, bool mortgage) {
+    if (!mortgage && temp.house.value >= balance) {
+      DataFeed.addEvent("You don't have enough money to buy this house");
+      updateHappiness(-10);
+    } else if (!mortgage && temp.house.value < balance) {
+      DataFeed.addEvent("You just bought a " + temp.house.name);
+      houses.add(temp);
+      parentsHouse = false;
+      balance -= temp.house.value;
+      updateHappiness(15);
+    } else if (mortgage && actualJobOffer == null) {
+      DataFeed.addEvent("You need a job to apply for a mortgage");
+      updateHappiness(-10);
+    } else if (mortgage && actualJobOffer!.salaire * 1000 <= temp.wage) {
+      DataFeed.addEvent("You dont earn enough money to buy this house");
+      updateHappiness(-10);
+    } else {
+      temp.duration = 20;
+      DataFeed.addEvent("You just signed a " +
+          temp.duration.toString() +
+          " years mortgage to buy a " +
+          temp.house.name);
+      houses.add(temp);
+      parentsHouse = false;
+      updateHappiness(10);
+    }
+  }
+
+  void sellHouse(Rent house) {
+    int proba = Random().nextInt(101);
+    if (Random().nextInt(101) < proba) {
+      DataFeed.addEvent("You managed to sell your " +
+          house.house.name +
+          " for " +
+          house.house.value.toString() +
+          ".");
+      balance += house.house.value;
+      if (house.duration > 0) {
+        int remainingMortgage = house.wage * house.duration;
+        balance -= remainingMortgage;
+        DataFeed.addEvent(remainingMortgage.toString() +
+            "€ were used to pay the end of the mortgage.");
+      }
+      if (age < 35) {
+        parentsHouse = true;
+        parentsFree = true;
+        DataFeed.addEvent("I went back to my parents house.");
+      }
+      houses.remove(house);
+    } else {
+      DataFeed.addEvent("Nobody was interested in your house.");
+    }
+  }
+
+  playLoto() {
+    if (canLottery) {
+      if (balance > 3) {
+        canLottery = false;
+        balance -= 3;
+
+        int toFind = Random().nextInt(100000);
+        int ticket = Random().nextInt(100000);
+        int prize = nextInt(1000, 3000000);
+
+        if (toFind == ticket) {
+          DataFeed.addEvent(
+              "I won " + prize.toString() + "€ at the lottery !!!");
+          updateHappiness(45);
+          balance += prize;
+        } else {
+          DataFeed.addEvent("What a surprise ! I didn't won the lottery");
+        }
+      } else {
+        DataFeed.addEvent("You don't even have 3€ for a lottery ticket !!");
+      }
+    }
   }
 }

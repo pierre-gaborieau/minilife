@@ -63,6 +63,16 @@ class MiscActions extends StatelessWidget {
                             listCountry: tmpList,
                           ));
                 }),
+          if (DataCommon.mainCharacter.age >= 18 &&
+              DataCommon.mainCharacter.canLottery)
+            ListTile(
+              leading: const Icon(Icons.euro_rounded),
+              title: const Text("Buy a lottery ticket"),
+              onTap: () {
+                DataCommon.mainCharacter.playLoto();
+                update(2);
+              },
+            ),
         ],
       ),
     );

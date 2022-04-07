@@ -51,6 +51,28 @@ class StaticHouse {
   ];
 
   static List<Rent> availableRent = [];
+  static List<Rent> availableToBuy = [];
+
+  static generateSell() {
+    availableToBuy.clear();
+    List<House> tmpHouse = [];
+    tmpHouse = listHouseType;
+    for (int i = 0; i < 10; i++) {
+      House houseToCopy = tmpHouse[Random().nextInt(tmpHouse.length)];
+      House houseToRent = House(
+          name: houseToCopy.name,
+          rooms: houseToCopy.rooms,
+          bathrooms: houseToCopy.bathrooms,
+          terrainSize: houseToCopy.terrainSize,
+          pool: houseToCopy.pool,
+          value: houseToCopy.value);
+      houseToRent.localisation = DataCommon.mainCharacter.livingCountry;
+      houseToRent.value =
+          nextInt((houseToRent.value * 0.8).toInt(), houseToRent.value * 2);
+      Rent temp = Rent(houseToRent, houseToRent.value ~/ 20, true);
+      availableToBuy.add(temp);
+    }
+  }
 
   static generateRent() {
     availableRent.clear();

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:minilife/Data/data_common.dart';
+import 'package:minilife/Screens/all/home_screen.dart';
 
 class ProfessionalScreen extends StatelessWidget {
   final ValueChanged<int> update;
@@ -33,6 +34,7 @@ class ProfessionalScreen extends StatelessWidget {
             subtitle: Text("Performance : " +
                 DataCommon.mainCharacter.performancePro!.toString() +
                 " %"),
+            onTap: () => _navigateToActualJob(context),
           ),
         ListTile(
           leading: const Icon(Icons.menu_book_rounded),
@@ -48,7 +50,17 @@ class ProfessionalScreen extends StatelessWidget {
           leading: const Icon(Icons.star_border_outlined),
           title: const Text("Special Career"),
           onTap: () => Navigator.pushNamed(context, '/specialcareers'),
-        )
+        ),
+        if ((DataCommon.mainCharacter.yearsOfWork >= 43 ||
+                DataCommon.mainCharacter.age >= 70) &&
+            !DataCommon.mainCharacter.retired)
+          ListTile(
+              leading: const Icon(Icons.wallet_travel),
+              title: const Text("Retire"),
+              onTap: () => showDialog(
+                  context: context,
+                  builder: (BuildContext context2) =>
+                      RetirementDialog(update: update))),
       ],
     ));
   }
@@ -63,6 +75,14 @@ class ProfessionalScreen extends StatelessWidget {
 
   void _navigateToJobs(BuildContext context) async {
     var translate = await Navigator.of(context).pushNamed("/jobs");
+
+    if (translate == true) {
+      update(2);
+    }
+  }
+
+  void _navigateToActualJob(BuildContext context) async {
+    var translate = await Navigator.of(context).pushNamed("/actualJob");
 
     if (translate == true) {
       update(2);

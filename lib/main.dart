@@ -2,22 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:minilife/Data/data_common.dart';
 import 'package:minilife/Data/static_house.dart';
 import 'package:minilife/Screens/all/professional_addons/actual_job.dart';
+import 'package:minilife/Screens/all/properties_addons/buy_house.dart';
 import 'package:minilife/Screens/all/properties_addons/rent_house.dart';
 import 'package:minilife/Screens/screens.dart';
-
-import 'Data/data_feed.dart';
 import 'Data/static_carreer.dart';
 
 void main() {
   runApp(const MyApp());
   DataCommon.generateMainCharacter();
   StaticHouse.generateRent();
-  DataFeed.addEvent("You were born as " +
-      DataCommon.mainCharacter.firstName +
-      " " +
-      DataCommon.mainCharacter.lastName +
-      " you are living in " +
-      DataCommon.mainCharacter.livingCountry.name);
+  StaticHouse.generateSell();
 }
 
 class MyApp extends StatelessWidget {
@@ -38,10 +32,11 @@ class MyApp extends StatelessWidget {
         '/jobs': (context) => const JobsScreen(),
         '/specialcareers': (context) => const SpecialCareers(),
         '/cv': (context) => const CurriculumVitae(),
-        '/actual': (context) => const ActualJob(),
+        '/actualJob': (context) => const ActualJob(),
         //Properties Links
         '/houses': (context) => const HousesScreen(),
         '/rent': (context) => const RentHouse(),
+        '/buyHouse': (context) => const BuyHouse(),
         '/misc': (context) => const MiscScreen(),
         '/cars': (context) => const CarsScreen(),
         '/shopping': (context) => const ShoppingScreen(),

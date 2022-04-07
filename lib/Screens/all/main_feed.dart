@@ -29,6 +29,7 @@ class _MainFeedState extends State<MainFeed> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
@@ -47,12 +48,23 @@ class _MainFeedState extends State<MainFeed> {
                       )
                     ],
                   ),
+                  DataCommon.mainCharacter.male
+                      ? const Icon(Icons.male)
+                      : const Icon(Icons.female),
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Row(
                         children: [
                           Text("Happiness : " +
                               DataCommon.mainCharacter.happiness.toString() +
+                              "%"),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text("Health : " +
+                              DataCommon.mainCharacter.health.toString() +
                               "%")
                         ],
                       )
