@@ -13,6 +13,8 @@ import 'package:minilife/Model/Carreer/poste.dart';
 import 'package:minilife/Model/Country/country.dart';
 import 'package:minilife/Model/Health/regime.dart';
 import 'package:minilife/Model/Houses/rent.dart';
+import 'package:minilife/Model/Relations/love_relation.dart';
+import 'package:minilife/Model/Relations/parent_relation.dart';
 import 'package:minilife/Model/School/degree.dart';
 import 'package:minilife/Model/School/formation.dart';
 import 'package:minilife/Screens/all/home_screen.dart';
@@ -25,6 +27,7 @@ class Human {
   int happiness = 100;
   int balance = 0;
   int health;
+  bool alive = true;
   bool male;
 
   //Health info
@@ -46,6 +49,13 @@ class Human {
   JobOffer? actualJobOffer;
   bool canWorkHarder = true;
 
+  //Family Info
+  ParentRelation? mother;
+  ParentRelation? father;
+  late LoveRelation love;
+  List<Human> sibblings = [];
+  List<Human> childrens = [];
+
   //Addictions Info
   List<Alcool> alcoolAddict = [];
   bool canTherapy = true;
@@ -62,8 +72,18 @@ class Human {
   bool parentsFree = true;
   List<Rent> houses = [];
 
-  Human(this.firstName, this.lastName, this.male, this.age, this.health,
-      this.regime, this.birthCountry, this.nationality, this.livingCountry);
+  Human(
+      this.firstName,
+      this.lastName,
+      this.male,
+      this.age,
+      this.health,
+      this.regime,
+      this.birthCountry,
+      this.nationality,
+      this.livingCountry,
+      this.mother,
+      this.father);
 
   bool ageUp(BuildContext context, ValueChanged<int> update) {
     canLottery = true;
@@ -80,6 +100,8 @@ class Human {
     updateHappiness(-(3 + alcoolAddict.length));
     age++;
     DataFeed.addEvent("\n\n" + age.toString() + " years old");
+    everyYearRiskOfDeath(false);
+    ageOther();
 
     //gestion du regime
     updateHealth(regime.health);
@@ -785,6 +807,43 @@ class Human {
       } else {
         DataFeed.addEvent("You don't even have 3€ for a lottery ticket !!");
       }
+    }
+  }
+
+  everyYearRiskOfDeath(bool other) {
+    int proba = 5;
+    proba += age ~/ 10;
+
+    if (health == 0) {
+      proba += 35;
+    } else {
+      proba += ((1 / health) * 100).toInt();
+    }
+
+    proba += numberOfAddiction() * 5;
+
+    if (Random().nextInt(101) < proba) {
+      alive = false;
+      if (!other) {
+        DataFeed.addEvent("You died in mysterious conditions...");
+      } else {
+        DataFeed.addEvent(getFullName() + " died in mysterious conditions...");
+      }
+    }
+  }
+
+  String getFullName() {
+    return firstName + " " + lastName;
+  }
+
+  void ageOther() {
+    if (mother != null && mother!.parent.alive) {
+      mother!.parent.age++;
+      mother!.parent.everyYearRiskOfDeath(true);
+    }
+    if (father != null && father!.parent.alive) {
+      father!.parent.age++;
+      father!.parent.everyYearRiskOfDeath(true);
     }
   }
 }

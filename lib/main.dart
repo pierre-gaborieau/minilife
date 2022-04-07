@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:minilife/Data/data_common.dart';
-import 'package:minilife/Data/static_house.dart';
 import 'package:minilife/Screens/all/professional_addons/actual_job.dart';
 import 'package:minilife/Screens/all/properties_addons/buy_house.dart';
 import 'package:minilife/Screens/all/properties_addons/rent_house.dart';
 import 'package:minilife/Screens/screens.dart';
 import 'Data/static_carreer.dart';
 
-void main() {
+void main() async {
   runApp(const MyApp());
-  DataCommon.generateMainCharacter();
-  StaticHouse.generateRent();
-  StaticHouse.generateSell();
+  await DataCommon.generateMainCharacters();
 }
 
 class MyApp extends StatelessWidget {

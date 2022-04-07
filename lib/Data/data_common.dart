@@ -2,40 +2,101 @@ import 'dart:math';
 
 import 'package:minilife/Data/data_feed.dart';
 import 'package:minilife/Data/static_country.dart';
+import 'package:minilife/Data/static_house.dart';
 import 'package:minilife/Data/static_regime.dart';
 import 'package:minilife/Model/Alcool/alcool.dart';
 import 'package:minilife/Model/Country/country.dart';
+import 'package:minilife/Model/Health/regime.dart';
 import 'package:minilife/Model/Human/human.dart';
+import 'package:minilife/Model/Relations/love_relation.dart';
+import 'package:minilife/Model/Relations/parent_relation.dart';
 
 class DataCommon {
-  static void generateMainCharacter() {
-    bool isMale = Random().nextBool();
+  static Future<void> generateMainCharacters() async {
     Country country = StaticCountry
-        .worldList[Random().nextInt(StaticCountry.worldList.length + 1)];
+        .worldList[Random().nextInt(StaticCountry.worldList.length)];
+    int ageMother = nextInt(18, 40);
+    int ageFather = nextInt(18, ageMother + 10);
+    int balanceParent = nextInt(1000, 1000000);
+
+    Country countryMother = StaticCountry
+        .worldList[Random().nextInt(StaticCountry.worldList.length)];
+    Country countryFather = StaticCountry
+        .worldList[Random().nextInt(StaticCountry.worldList.length)];
+    Regime regimeParents = StaticRegime
+        .listRegime[Random().nextInt(StaticRegime.listRegime.length)];
+    String fatherLastName =
+        countryFather.lastName[Random().nextInt(countryFather.lastName.length)];
+    Human mother = Human(
+        countryMother.getName(false),
+        countryMother.lastName[Random().nextInt(countryMother.lastName.length)],
+        false,
+        ageMother,
+        Random().nextInt(101),
+        regimeParents,
+        countryMother,
+        country,
+        country,
+        null,
+        null);
+    Human father = Human(
+        countryFather.getName(true),
+        fatherLastName,
+        true,
+        ageFather,
+        Random().nextInt(101),
+        regimeParents,
+        countryFather,
+        country,
+        country,
+        null,
+        null);
+    LoveRelation parents = LoveRelation(mother, father);
+    if (Random().nextInt(101) > 33) {
+      parents.married = true;
+      parents.balance = balanceParent;
+      mother.lastName = father.lastName;
+    } else {
+      mother.balance = balanceParent ~/ 2;
+      father.balance = balanceParent ~/ 2;
+    }
+
+    mother.love = parents;
+    father.love = parents;
+
+    bool isMale = Random().nextBool();
     String firstName = country.getName(isMale);
 
-    String lastName =
-        country.lastName[Random().nextInt(country.lastName.length + 1)];
     mainCharacter = Human(
         firstName,
-        lastName,
+        fatherLastName,
         isMale,
         0,
         Random().nextInt(101),
-        StaticRegime
-            .listRegime[Random().nextInt(StaticRegime.listRegime.length + 1)],
+        regimeParents,
         country,
         country,
-        country);
+        country,
+        ParentRelation(mother, true),
+        ParentRelation(father, false));
 
     DataFeed.addEvent("You were born as " +
-        DataCommon.mainCharacter.firstName +
-        " " +
-        DataCommon.mainCharacter.lastName +
+        DataCommon.mainCharacter.getFullName() +
         " you are living in " +
         DataCommon.mainCharacter.livingCountry.name);
     DataFeed.addEvent(
-        "You parents food habits are : " + mainCharacter.regime.nom);
+        "Your parents food habits are : " + mainCharacter.regime.nom);
+    DataFeed.addEvent("Your parents are " +
+        mother.getFullName() +
+        " and " +
+        father.getFullName());
+    if (Random().nextInt(1001) == Random().nextInt(1001)) {
+      DataFeed.addEvent("Your mother died while she was giving you birth.");
+      mother.alive = false;
+      mainCharacter.father!.relation -= 50;
+    }
+    StaticHouse.generateRent();
+    StaticHouse.generateSell();
   }
 
   static late Human mainCharacter;
@@ -51,4 +112,9 @@ class DataCommon {
     Alcool(name: "Cocktails", danger: 5),
     Alcool(name: "Gin", danger: 8),
   ];
+
+  static int nextInt(int min, int max) {
+    int vretour = min + Random().nextInt(max - min);
+    return vretour;
+  }
 }

@@ -17,9 +17,9 @@ class Country {
 
   getName(bool isMale) {
     if (isMale) {
-      return firstNameMale[Random().nextInt(firstNameMale.length + 1)];
+      return firstNameMale[Random().nextInt(firstNameMale.length)];
     } else {
-      return firstNameFemale[Random().nextInt(firstNameFemale.length + 1)];
+      return firstNameFemale[Random().nextInt(firstNameFemale.length)];
     }
   }
 }
