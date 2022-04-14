@@ -6,6 +6,7 @@ import 'package:minilife/Data/static_carreer.dart';
 import 'package:minilife/Data/static_degree.dart';
 import 'package:minilife/Data/static_formations.dart';
 import 'package:minilife/Data/static_house.dart';
+import 'package:minilife/Data/static_music.dart';
 import 'package:minilife/Model/Alcool/alcool.dart';
 import 'package:minilife/Model/Carreer/carreer.dart';
 import 'package:minilife/Model/Carreer/job_offer.dart';
@@ -13,11 +14,21 @@ import 'package:minilife/Model/Carreer/poste.dart';
 import 'package:minilife/Model/Country/country.dart';
 import 'package:minilife/Model/Health/regime.dart';
 import 'package:minilife/Model/Houses/rent.dart';
+import 'package:minilife/Model/Leisure/Music/instrument.dart';
+import 'package:minilife/Model/Leisure/Music/instrument_object.dart';
+import 'package:minilife/Model/Leisure/Music/instrument_practice.dart';
+import 'package:minilife/Model/Leisure/Music/music_genre.dart';
+import 'package:minilife/Model/Relations/children_relations.dart';
 import 'package:minilife/Model/Relations/love_relation.dart';
 import 'package:minilife/Model/Relations/parent_relation.dart';
 import 'package:minilife/Model/School/degree.dart';
 import 'package:minilife/Model/School/formation.dart';
-import 'package:minilife/Screens/all/home_screen.dart';
+import 'package:minilife/Model/SpecialCarreer/MusicArtist/band.dart';
+import 'package:minilife/Model/SpecialCarreer/MusicArtist/musician.dart';
+import 'package:minilife/Model/SpecialCarreer/MusicArtist/records.dart';
+import 'package:minilife/Model/SpecialCarreer/celebrity.dart';
+import 'package:minilife/Screens/screens.dart';
+import 'package:minilife/Widgets/widgets.dart';
 
 class Human {
   //Base infos
@@ -32,6 +43,7 @@ class Human {
 
   //Health info
   Regime regime;
+  late String deathReason;
 
   //School/Work infos
   Formation? currentlyLearning;
@@ -49,12 +61,16 @@ class Human {
   JobOffer? actualJobOffer;
   bool canWorkHarder = true;
 
+  //Celebrity Info
+  Celebrity? celebrity;
+  List<Band> listBand = [];
+
   //Family Info
   ParentRelation? mother;
   ParentRelation? father;
   late LoveRelation love;
   List<Human> sibblings = [];
-  List<Human> childrens = [];
+  List<ChildrenRelation> childrens = [];
 
   //Addictions Info
   List<Alcool> alcoolAddict = [];
@@ -72,6 +88,12 @@ class Human {
   bool parentsFree = true;
   List<Rent> houses = [];
 
+  //Leisure Info
+  int creativity = 0;
+  bool practice = false;
+  List<InstrumentObject> instrumentObject = [];
+  List<InstrumentPractice> instrumentPractice = [];
+
   Human(
       this.firstName,
       this.lastName,
@@ -86,6 +108,8 @@ class Human {
       this.father);
 
   bool ageUp(BuildContext context, ValueChanged<int> update) {
+    creativity = 0;
+    practice = false;
     canLottery = true;
     askPayRise = true;
     bool vretour = false;
@@ -93,6 +117,7 @@ class Human {
     StaticHouse.generateRent();
     StaticHouse.generateSell();
     StaticCarreer.jobOffer.shuffle();
+    StaticMusic.generateSellInstrument();
 
     canWorkHarder = true;
     canTherapy = true;
@@ -100,8 +125,10 @@ class Human {
     updateHappiness(-(3 + alcoolAddict.length));
     age++;
     DataFeed.addEvent("\n\n" + age.toString() + " years old");
-    everyYearRiskOfDeath(false);
-    ageOther();
+    everyYearRiskOfDeath(false, context, update);
+    ageOther(context, update);
+    if (celebrity != null) celebrity!.updateFanbase();
+    if (listBand.isNotEmpty) musicianPay();
 
     //gestion du regime
     updateHealth(regime.health);
@@ -114,10 +141,34 @@ class Human {
       balance += retirementAid * 1000;
     }
 
+    if (age > 9 && age < 18) {
+      int money = nextInt(1, 300);
+      DataFeed.addEvent(
+          "You received " + money.toString() + "€ by your parents");
+      balance += money;
+    }
+
     if (performancePro != null && performancePro! > 0) {
       performancePro = nextInt(
           (performancePro! * 0.9).toInt(), (performancePro! * 1.1).toInt());
       updatePerformancePro(0);
+    }
+
+    for (var element in instrumentObject) {
+      element.updatePopularityAndPrice();
+    }
+
+    for (var elem in instrumentPractice) {
+      elem.updateMastery();
+    }
+
+    if (Random().nextInt(501) == Random().nextInt(501)) {
+      StaticMusic.instrumentToSell.shuffle();
+      InstrumentObject gift = StaticMusic.instrumentToSell.first;
+      DataFeed.addEvent("A stranger gave you a " + gift.getName());
+      updateHappiness(10);
+      instrumentObject.add(gift);
+      StaticMusic.generateSellInstrument();
     }
 
     ///Jour de paie !
@@ -156,19 +207,9 @@ class Human {
     }
 
     //Paie des loyers et prets
-    if (houses.isNotEmpty) {
-      for (var element in houses) {
-        if (element.isBuying) {
-          element.house.value = nextInt((element.house.value * 0.9).toInt(),
-              (element.house.value * 1.1).toInt());
-          if (element.duration > 0) {
-            element.duration--;
-            balance -= element.wage;
-          }
-        } else {
-          balance -= element.wage;
-        }
-      }
+
+    for (var element in houses) {
+      element.yearlyFunction(this);
     }
 
     //Début du loyer à ses parents
@@ -301,8 +342,26 @@ class Human {
             .isEmpty) updateHealth(-10);
 
     updateHealth(-alcoolAddict.length * 2);
-
+    creativity += nextInt(0, 10);
+    if (happiness < 20 || happiness > 80) creativity += nextInt(1, 20);
+    if (happiness == 0 || happiness == 100) creativity += nextInt(1, 20);
+    creativity += numberOfAddiction() * nextInt(1, 4);
+    if (actualJobOffer != null) creativity = creativity ~/ 2;
+    if (health < 20 || health > 80) creativity += nextInt(1, 10);
     return vretour;
+  }
+
+  purchaseInstrument(InstrumentObject instrument) {
+    if (balance > instrument.price) {
+      updateHappiness(10);
+      DataFeed.addEvent("You just bought a " + instrument.getName() + " !");
+      balance -= instrument.price;
+      instrumentObject.add(instrument);
+      StaticMusic.instrumentToSell.remove(instrument);
+    } else {
+      DataFeed.addEvent("You cannot afford that.");
+      updateHappiness(-5);
+    }
   }
 
   askCitizenship() {
@@ -353,23 +412,8 @@ class Human {
   }
 
   rentApply(Rent offer) {
-    int prob = 10;
-    if (actualJobOffer != null) {
-      prob += 50;
-      if (actualJobOffer!.salaire >= offer.wage * 2) {
-        prob += 20;
-      }
-    }
-
-    if (balance > offer.wage) {
-      prob += 10;
-    }
-
-    if (age < 25) {
-      prob -= 15;
-    }
-    int randnum = Random().nextInt(101);
-    if (randnum <= prob) {
+    bool success = offer.rentApply(this);
+    if (success) {
       parentsHouse = false;
       parentsFree = false;
       houses.add(offer);
@@ -563,18 +607,11 @@ class Human {
   }
 
   void emigrate(Country countryChoice) {
-    int proba = 80;
+    bool success = countryChoice.emigrate(this);
+
     int price = nextInt(0, 2500);
 
-    if (countryChoice == nationality) proba == 100;
-
-    if (!countryChoice.bordersOpen) {
-      proba -= 30;
-      DataFeed.addEvent(countryChoice.name +
-          " has closed their borders. I have to ask for a Visa");
-    }
-
-    if (Random().nextInt(101) <= proba) {
+    if (success) {
       if (balance > price) {
         balance -= price;
         DataFeed.addEvent("I was admit to " +
@@ -594,8 +631,7 @@ class Human {
         parentsHouse = false;
         livingCountry = countryChoice;
         yearsOfEmigrate = 0;
-        StaticHouse.generateSell();
-        StaticHouse.generateRent();
+        DataCommon.generateData();
       } else {
         DataFeed.addEvent("I was admit to " +
             countryChoice.name +
@@ -775,7 +811,10 @@ class Human {
         DataFeed.addEvent(remainingMortgage.toString() +
             "€ were used to pay the end of the mortgage.");
       }
-      if (age < 35) {
+      if (age < 35 &&
+          houses
+              .where((element) => element.house.localisation == livingCountry)
+              .isEmpty) {
         parentsHouse = true;
         parentsFree = true;
         DataFeed.addEvent("I went back to my parents house.");
@@ -784,6 +823,30 @@ class Human {
     } else {
       DataFeed.addEvent("Nobody was interested in your house.");
     }
+  }
+
+  musicianPay() {
+    for (var element in StaticMusic.listMusicGenre) {
+      element.updatePopularity();
+    }
+    int payout = 0;
+    for (Band band in listBand) {
+      band.updateFanbase();
+      for (Records rec in band.disco) {
+        if (rec.years == 0) {
+          DataFeed.addEvent(band.bandName + " released the new record.");
+        }
+        payout += rec.buyUnits();
+      }
+    }
+    if (payout > 9600) {
+      yearsOfWork++;
+      unemployment += 1 / 2;
+    }
+
+    balance += payout;
+    DataFeed.addEvent(
+        "I earned " + payout.toString() + "€ from my music releases");
   }
 
   playLoto() {
@@ -810,24 +873,47 @@ class Human {
     }
   }
 
-  everyYearRiskOfDeath(bool other) {
-    int proba = 5;
+  everyYearRiskOfDeath(
+      bool other, BuildContext context, ValueChanged<int> _update) {
+    int proba = 0;
     proba += age ~/ 10;
 
     if (health == 0) {
-      proba += 35;
+      proba += 20;
     } else {
       proba += ((1 / health) * 100).toInt();
     }
 
     proba += numberOfAddiction() * 5;
 
-    if (Random().nextInt(101) < proba) {
+    if (Random().nextInt(1001) < proba) {
       alive = false;
       if (!other) {
-        DataFeed.addEvent("You died in mysterious conditions...");
+        deathReason = "You died in mysterious conditions...";
+        DataFeed.addEvent(deathReason);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => DeathScreen(update: _update)));
       } else {
         DataFeed.addEvent(getFullName() + " died in mysterious conditions...");
+        if (childrens
+            .where((element) => element.parent == DataCommon.mainCharacter)
+            .isNotEmpty) {
+          int relation = childrens
+              .where((element) => element.parent == DataCommon.mainCharacter)
+              .first
+              .relation;
+          DataCommon.mainCharacter.updateHappiness(-(relation ~/ 2));
+        }
+      }
+    }
+  }
+
+  void goBackToParents() {
+    if (mother != null && mother!.parent.alive) {
+      if (mother!.parent.regime != regime) {
+        regime = mother!.parent.regime;
       }
     }
   }
@@ -836,14 +922,132 @@ class Human {
     return firstName + " " + lastName;
   }
 
-  void ageOther() {
+  void ageOther(BuildContext context, ValueChanged<int> update) {
     if (mother != null && mother!.parent.alive) {
       mother!.parent.age++;
-      mother!.parent.everyYearRiskOfDeath(true);
+      mother!.parent.everyYearRiskOfDeath(true, context, update);
     }
     if (father != null && father!.parent.alive) {
       father!.parent.age++;
-      father!.parent.everyYearRiskOfDeath(true);
+      father!.parent.everyYearRiskOfDeath(true, context, update);
+    }
+  }
+
+  void changeFoodHabits(Regime regimeChoice) {
+    regime = regimeChoice;
+    DataFeed.addEvent("Your new food habit is : " + regime.nom);
+  }
+
+  practiceInstrument(Instrument instrument, bool lesson) {
+    if (!practice) {
+      practice = true;
+      if (instrumentPractice
+          .where((element) => element.instrument == instrument)
+          .isEmpty) {
+        instrumentPractice.add(InstrumentPractice(
+            instrument: instrument, mastery: nextInt(0, 15), playedGenres: []));
+      }
+      int prog = Random().nextInt(11);
+      if (lesson) {
+        if (parentsFree) {
+          DataFeed.addEvent(
+              "You parents paid you a " + instrument.name + " lesson");
+        } else {
+          balance -= instrument.practicePrice;
+        }
+        prog += Random().nextInt(11);
+      }
+      instrumentPractice
+          .where((element) => element.instrument == instrument)
+          .first
+          .mastery += prog;
+
+      if (instrumentPractice
+              .where((element) => element.instrument == instrument)
+              .first
+              .mastery <
+          0) {
+        instrumentPractice
+            .where((element) => element.instrument == instrument)
+            .first
+            .mastery = 0;
+      }
+      if (instrumentPractice
+              .where((element) => element.instrument == instrument)
+              .first
+              .mastery >
+          100) {
+        instrumentPractice
+            .where((element) => element.instrument == instrument)
+            .first
+            .mastery = 100;
+      }
+
+      DataFeed.addEvent("You practiced " + instrument.name);
+    } else {
+      DataFeed.addEvent("You already practice an instrument this year.");
+    }
+  }
+
+  void createMusicArtist(String pseudo, Instrument instrument) {
+    if (instrumentPractice
+        .where((element) => element.instrument == instrument)
+        .isEmpty) {
+      instrumentPractice.add(InstrumentPractice(
+          instrument: instrument, mastery: nextInt(0, 5), playedGenres: []));
+      DataFeed.addEvent("I have start playing " + instrument.name);
+    }
+
+    if (celebrity == null) {
+      celebrity = Celebrity(name: pseudo, fanbase: 0);
+    } else if (pseudo != celebrity!.name) {
+      celebrity!.name = pseudo;
+      DataFeed.addEvent("I am now known as " + pseudo);
+    }
+
+    celebrity!.listSpe
+        .add(Musician(instrument: instrument, genre: [], disco: []));
+  }
+
+  void createMusicBand(String bandName, bool isSolo, Genre genre) {
+    int members;
+    if (isSolo) {
+      members = 1;
+    } else if (Random().nextBool()) {
+      members = nextInt(6, 11);
+    } else {
+      members = nextInt(2, 6);
+    }
+
+    listBand.add(Band(
+        bandName: bandName,
+        members: members,
+        genre: [genre],
+        fanbase: 0,
+        disco: []));
+    DataFeed.addEvent("I am now playing in " + bandName);
+  }
+
+  sellInstrument(InstrumentObject instrument) {
+    if (Random().nextBool()) {
+      int price = instrument.price;
+      price += instrument.popularity;
+      price += instrument.inspiration;
+      if (celebrity != null) {
+        if (celebrity!.fanbase > 1000) {
+          price += instrument.albumRecords * (celebrity!.fanbase ~/ 1000);
+        } else if (celebrity!.fanbase > 100) {
+          price += instrument.albumRecords * (celebrity!.fanbase ~/ 100);
+        }
+      }
+      balance += price;
+      DataFeed.addEvent("You sold your " +
+          instrument.getName() +
+          " for " +
+          price.toString() +
+          "€.");
+    } else {
+      DataFeed.addEvent("Nobody want your instrument");
     }
   }
 }

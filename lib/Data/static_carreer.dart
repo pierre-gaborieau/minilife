@@ -40,7 +40,12 @@ class StaticCarreer {
       salaireMin: 33,
       salaireMax: 60,
       requirement: StaticFormations.formationComputerScience,
-    )
+    ),
+    Poste(
+        nom: "Lead Tech",
+        salaireMin: 40,
+        salaireMax: 70,
+        requirement: StaticFormations.formationComputerScience),
   ]);
 
   static Carreer restaurationCarreer =

@@ -3,11 +3,13 @@ import 'dart:math';
 import 'package:minilife/Data/data_feed.dart';
 import 'package:minilife/Data/static_country.dart';
 import 'package:minilife/Data/static_house.dart';
+import 'package:minilife/Data/static_music.dart';
 import 'package:minilife/Data/static_regime.dart';
 import 'package:minilife/Model/Alcool/alcool.dart';
 import 'package:minilife/Model/Country/country.dart';
 import 'package:minilife/Model/Health/regime.dart';
 import 'package:minilife/Model/Human/human.dart';
+import 'package:minilife/Model/Relations/children_relations.dart';
 import 'package:minilife/Model/Relations/love_relation.dart';
 import 'package:minilife/Model/Relations/parent_relation.dart';
 
@@ -80,6 +82,12 @@ class DataCommon {
         ParentRelation(mother, true),
         ParentRelation(father, false));
 
+    ChildrenRelation relation = ChildrenRelation(
+        parent: mainCharacter, isAdopted: false, isStep: false);
+
+    mother.childrens.add(relation);
+    father.childrens.add(relation);
+
     DataFeed.addEvent("You were born as " +
         DataCommon.mainCharacter.getFullName() +
         " you are living in " +
@@ -95,11 +103,16 @@ class DataCommon {
       mother.alive = false;
       mainCharacter.father!.relation -= 50;
     }
-    StaticHouse.generateRent();
-    StaticHouse.generateSell();
+    generateData();
   }
 
   static late Human mainCharacter;
+
+  static void generateData() {
+    StaticHouse.generateRent();
+    StaticHouse.generateSell();
+    StaticMusic.generateSellInstrument();
+  }
 
   static List<Alcool> listAlcool = [
     Alcool(name: "Beer", danger: 1),

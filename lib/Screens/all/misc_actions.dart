@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:minilife/Data/data_common.dart';
 import 'package:minilife/Data/static_country.dart';
 import 'package:minilife/Model/Country/country.dart';
+import 'package:minilife/Widgets/widgets.dart';
 
 class MiscActions extends StatelessWidget {
   final ValueChanged<int> update;
@@ -63,6 +64,12 @@ class MiscActions extends StatelessWidget {
                             listCountry: tmpList,
                           ));
                 }),
+          if (DataCommon.mainCharacter.age > 3)
+            ListTile(
+              leading: const Icon(Icons.music_note_rounded),
+              title: const Text("Practice an Instrument"),
+              onTap: () => _navigateToMusic(context),
+            ),
           if (DataCommon.mainCharacter.age >= 18 &&
               DataCommon.mainCharacter.canLottery)
             ListTile(
@@ -73,9 +80,29 @@ class MiscActions extends StatelessWidget {
                 update(2);
               },
             ),
+          if (DataCommon.mainCharacter.parentsHouse == false)
+            ListTile(
+              leading: const Icon(Icons.food_bank_outlined),
+              title: const Text("Choose your food habits"),
+              onTap: () {
+                showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (BuildContext context2) =>
+                        DialogFood(update: update));
+              },
+            ),
         ],
       ),
     );
+  }
+
+  void _navigateToMusic(BuildContext context) async {
+    var translate = await Navigator.of(context).pushNamed('/musicLearn');
+
+    if (translate == true) {
+      update(2);
+    }
   }
 
   void _navigateToAddiction(BuildContext context) async {
@@ -84,64 +111,5 @@ class MiscActions extends StatelessWidget {
     if (translate == true) {
       update(2);
     }
-  }
-}
-
-class DialogEmigrate extends StatefulWidget {
-  final ValueChanged<int> update;
-  final List<Country> listCountry;
-  const DialogEmigrate({
-    Key? key,
-    required this.update,
-    required this.listCountry,
-  }) : super(key: key);
-
-  @override
-  State<DialogEmigrate> createState() => _DialogEmigrateState();
-}
-
-class _DialogEmigrateState extends State<DialogEmigrate> {
-  late Country countryChoice;
-
-  @override
-  void initState() {
-    super.initState();
-    countryChoice = widget.listCountry.first;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text("Emigrate"),
-      content: DropdownButton<Country>(
-        value: countryChoice,
-        items:
-            widget.listCountry.map<DropdownMenuItem<Country>>((Country item) {
-          return DropdownMenuItem<Country>(
-            child: Text(item.name),
-            value: item,
-          );
-        }).toList(),
-        onChanged: (item) {
-          setState(() {
-            countryChoice = item!;
-          });
-        },
-      ),
-      actions: [
-        TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text("Cancel")),
-        TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              DataCommon.mainCharacter.emigrate(countryChoice);
-              widget.update(2);
-            },
-            child: const Text("Emigrate"))
-      ],
-    );
   }
 }

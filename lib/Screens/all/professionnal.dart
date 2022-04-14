@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:minilife/Data/data_common.dart';
-import 'package:minilife/Screens/all/home_screen.dart';
+import 'package:minilife/Widgets/widgets.dart';
 
 class ProfessionalScreen extends StatelessWidget {
   final ValueChanged<int> update;
@@ -49,7 +49,7 @@ class ProfessionalScreen extends StatelessWidget {
         ListTile(
           leading: const Icon(Icons.star_border_outlined),
           title: const Text("Special Career"),
-          onTap: () => Navigator.pushNamed(context, '/specialcareers'),
+          onTap: () => _navigateToSpecialCarreer(context),
         ),
         if ((DataCommon.mainCharacter.yearsOfWork >= 43 ||
                 DataCommon.mainCharacter.age >= 70) &&
@@ -75,6 +75,14 @@ class ProfessionalScreen extends StatelessWidget {
 
   void _navigateToJobs(BuildContext context) async {
     var translate = await Navigator.of(context).pushNamed("/jobs");
+
+    if (translate == true) {
+      update(2);
+    }
+  }
+
+  void _navigateToSpecialCarreer(BuildContext context) async {
+    var translate = await Navigator.of(context).pushNamed("/specialcareers");
 
     if (translate == true) {
       update(2);

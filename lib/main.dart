@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:minilife/Data/data_common.dart';
-import 'package:minilife/Screens/all/professional_addons/actual_job.dart';
-import 'package:minilife/Screens/all/properties_addons/buy_house.dart';
-import 'package:minilife/Screens/all/properties_addons/rent_house.dart';
 import 'package:minilife/Screens/screens.dart';
 import 'Data/static_carreer.dart';
 
@@ -30,6 +27,7 @@ class MyApp extends StatelessWidget {
         '/specialcareers': (context) => const SpecialCareers(),
         '/cv': (context) => const CurriculumVitae(),
         '/actualJob': (context) => const ActualJob(),
+        '/musicCarreer': (context) => const MusicCarreer(),
         //Properties Links
         '/houses': (context) => const HousesScreen(),
         '/rent': (context) => const RentHouse(),
@@ -37,8 +35,10 @@ class MyApp extends StatelessWidget {
         '/misc': (context) => const MiscScreen(),
         '/cars': (context) => const CarsScreen(),
         '/shopping': (context) => const ShoppingScreen(),
+        '/musicStore': (context) => const MusicStore(),
         //Miscactions links
         '/addictions': (context) => const AddictionCenter(),
+        '/musicLearn': (context) => const MusicLearn(),
       },
       debugShowCheckedModeBanner: false,
       title: 'MiniLife',

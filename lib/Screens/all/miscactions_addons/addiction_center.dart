@@ -24,7 +24,7 @@ class AddictionCenter extends StatelessWidget {
                 DataCommon.mainCharacter.alcoolTherapy(a);
                 Navigator.pop(context, true);
               },
-            )
+            ),
         ],
       ),
     );

@@ -8,6 +8,8 @@ class House {
   final bool pool;
   Country? localisation;
   int value;
+  final int minAnnualPrice;
+  final int maxAnnualPrice;
 
   House({
     required this.name,
@@ -15,6 +17,9 @@ class House {
     required this.bathrooms,
     required this.terrainSize,
     required this.pool,
+    this.localisation,
     required this.value,
+    required this.minAnnualPrice,
+    required this.maxAnnualPrice,
   });
 }

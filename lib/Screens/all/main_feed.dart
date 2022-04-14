@@ -45,7 +45,15 @@ class _MainFeedState extends State<MainFeed> {
                               DataCommon.mainCharacter.balance.toString() +
                               " €")
                         ],
-                      )
+                      ),
+                      if (DataCommon.mainCharacter.celebrity != null)
+                        Row(
+                          children: [
+                            Text("Fans : " +
+                                DataCommon.mainCharacter.celebrity!.fanbase
+                                    .toString())
+                          ],
+                        )
                     ],
                   ),
                   DataCommon.mainCharacter.male
@@ -66,6 +74,12 @@ class _MainFeedState extends State<MainFeed> {
                           Text("Health : " +
                               DataCommon.mainCharacter.health.toString() +
                               "%")
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text("Creativity : " +
+                              DataCommon.mainCharacter.creativity.toString())
                         ],
                       )
                     ],

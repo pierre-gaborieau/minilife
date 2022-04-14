@@ -26,12 +26,12 @@ class PropertiesScreen extends StatelessWidget {
         ListTile(
           leading: const Icon(Icons.folder_open),
           title: const Text("Misc Objects"),
-          onTap: () => Navigator.pushNamed(context, '/misc'),
+          onTap: () => _navigateToMisc(context),
         ),
         ListTile(
             leading: const Icon(Icons.shopping_bag_outlined),
             title: const Text("Go Shopping"),
-            onTap: () => Navigator.pushNamed(context, '/shopping')),
+            onTap: () => _navigateToShop(context)),
       ],
     ));
   }
@@ -39,6 +39,20 @@ class PropertiesScreen extends StatelessWidget {
   void _navigateToHouses(BuildContext context) async {
     var translate = await Navigator.of(context).pushNamed("/houses");
 
+    if (translate == true) {
+      update(2);
+    }
+  }
+
+  void _navigateToShop(BuildContext context) async {
+    var translate = await Navigator.of(context).pushNamed('/shopping');
+    if (translate == true) {
+      update(2);
+    }
+  }
+
+  void _navigateToMisc(BuildContext context) async {
+    var translate = await Navigator.of(context).pushNamed('/misc');
     if (translate == true) {
       update(2);
     }

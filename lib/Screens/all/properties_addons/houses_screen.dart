@@ -112,17 +112,28 @@ class HousesScreen extends StatelessWidget {
                         context: context,
                         builder: (BuildContext context2) => AlertDialog(
                               title: Text(house.house.name),
-                              content: Text("Bedrooms : " +
-                                  house.house.rooms.toString() +
-                                  " \nBathrooms : " +
-                                  house.house.bathrooms.toString() +
-                                  " \nSize of garden : " +
-                                  house.house.terrainSize.toString() +
-                                  " m² \nPool : " +
-                                  (house.house.pool == true ? "Yes" : "No") +
-                                  "\nAnnual Wage : " +
-                                  house.wage.toString() +
-                                  " €"),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text("Bedrooms : " +
+                                      house.house.rooms.toString()),
+                                  Text("Bathrooms : " +
+                                      house.house.bathrooms.toString()),
+                                  Text(" \nSize of garden : " +
+                                      house.house.terrainSize.toString() +
+                                      " m² "),
+                                  Text("Pool : " +
+                                      (house.house.pool == true
+                                          ? "Yes"
+                                          : "No")),
+                                  Text("Annual Wage : " +
+                                      house.wage.toString() +
+                                      " €"),
+                                  Text("Amount of renovations : " +
+                                      house.renovationAmount.toString() +
+                                      "€")
+                                ],
+                              ),
                               actions: [
                                 TextButton(
                                     onPressed: () => Navigator.pop(context2),
